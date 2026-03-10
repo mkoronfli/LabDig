@@ -19,7 +19,7 @@ end entity;
 architecture tb of cont10_4digitos_tb is
 
   -- Componente a ser testado (Device Under Test -- DUT)
-  component cont10 is
+  component cont10_4digitos is
       port (
         clock   : in  std_logic;
         clear   : in  std_logic;
@@ -57,7 +57,7 @@ begin
   clock_in <= (not clock_in) and keep_simulating after clockPeriod/2;
   
   ---- DUT para Caso de Teste 1
-  dut: cont10
+  dut: cont10_4digitos
       port map
       (
           clock    =>  clock_in, 
@@ -101,32 +101,34 @@ begin
     enable_in <= '1';
     wait for 18*clockPeriod;
     enable_in <= '0';
+    clear_in <= '1';
     wait until falling_edge(clock_in);
 
-    -- Teste #4: habilita contagem por 999 periodos de clock (teste de Q0, Q1 e Q2)
-    -- resultados esperados: Q0-Q2 variam de '0' a '999' (decimal), Q3 permanece em 0 
+    -- Teste #4: habilita contagem por 998 periodos de clock (teste de Q0, Q1 e Q2)
+    -- resultados esperados: Q0-Q2 variam de '0' a '998' (decimal), Q3 permanece em 0 
     -- RCO permanece em 0
     caso      <= 4;
+    clear_in <= '0';
     enable_in <= '1';
-    wait for 999*clockPeriod;
+    wait for 998*clockPeriod;
     enable_in <= '0';
     wait until falling_edge(clock_in);
 
-    -- Teste #5: habilita contagem por 9999 periodos de clock (teste de Q0, Q1, Q2 e Q3)
-    -- resultados esperados: Q0-Q3 variam de '0' a '9999' (decimal)
+    -- Teste #5: habilita contagem por 9000 periodos de clock (teste de Q0, Q1, Q2 e Q3)
+    -- resultados esperados: Q0-Q3 variam de '998'-do caso anterior- a '9998' (decimal)
     -- RCO permanece em 0
     caso      <= 5;
     enable_in <= '1';
-    wait for 9999*clockPeriod;
+    wait for 9000*clockPeriod;
     enable_in <= '0';
     wait until falling_edge(clock_in);
 
-    -- Teste #6: habilita contagem por 10000 periodos de clock (teste de RC0)
-    -- resultados esperados: Q0-Q3 variam de '0' a '9999' (decimal), depois zeram
-    -- RCO muda para 1, na última etapa
+    -- Teste #6: habilita contagem por 5 periodos de clock (teste de RC0)
+    -- resultados esperados: Q0-Q3 variam de '9998'-do caso anterior- a '10003' (decimal)
+    -- RCO muda para 1, quando satura o contador
     caso      <= 6;
     enable_in <= '1';
-    wait for 10000*clockPeriod;
+    wait for 5*clockPeriod;
     enable_in <= '0';
     wait until falling_edge(clock_in);
 
