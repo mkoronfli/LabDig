@@ -66,7 +66,7 @@ begin
 	RCO => RCO_mil
 	);
 
-	RCO <= RCO_mil and enable_mil;
+	RCO <= RCO_mil and RCO_cen and RCO_dez and RCO_uni;
 
 
 end architecture;
