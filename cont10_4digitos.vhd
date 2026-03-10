@@ -9,9 +9,9 @@ entity cont10_4digitos is
         clear   : in  std_logic;
         enable  : in  std_logic;
         Q0      : out std_logic_vector(3 downto 0);
-	Q1      : out std_logic_vector(3 downto 0);
-	Q2      : out std_logic_vector(3 downto 0);
-	Q3      : out std_logic_vector(3 downto 0);
+		Q1      : out std_logic_vector(3 downto 0);
+		Q2      : out std_logic_vector(3 downto 0);
+		Q3      : out std_logic_vector(3 downto 0);
         RCO     : out std_logic
     );
 end entity cont10_4digitos;
@@ -67,5 +67,6 @@ begin
 	);
 
 	RCO <= RCO_mil and enable_mil;
+
 
 end architecture;
