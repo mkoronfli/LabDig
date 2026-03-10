@@ -106,7 +106,7 @@ begin
     -- Teste #4: habilita contagem por 999 periodos de clock (teste de Q0, Q1 e Q2)
     -- resultados esperados: Q0-Q2 variam de '0' a '999' (decimal), Q3 permanece em 0 
     -- RCO permanece em 0
-    caso      <= 3;
+    caso      <= 4;
     enable_in <= '1';
     wait for 999*clockPeriod;
     enable_in <= '0';
@@ -115,7 +115,7 @@ begin
     -- Teste #5: habilita contagem por 9999 periodos de clock (teste de Q0, Q1, Q2 e Q3)
     -- resultados esperados: Q0-Q3 variam de '0' a '9999' (decimal)
     -- RCO permanece em 0
-    caso      <= 3;
+    caso      <= 5;
     enable_in <= '1';
     wait for 9999*clockPeriod;
     enable_in <= '0';
@@ -124,7 +124,7 @@ begin
     -- Teste #6: habilita contagem por 10000 periodos de clock (teste de RC0)
     -- resultados esperados: Q0-Q3 variam de '0' a '9999' (decimal), depois zeram
     -- RCO muda para 1, na última etapa
-    caso      <= 3;
+    caso      <= 6;
     enable_in <= '1';
     wait for 10000*clockPeriod;
     enable_in <= '0';
@@ -132,7 +132,7 @@ begin
 
     -- Teste #7: clear assincrono  
     -- resultado esperado: Q=0 e RCO=0   
-    caso     <= 4;
+    caso     <= 7;
     clear_in <= '1';
     wait for clockPeriod;
     clear_in <= '0';
