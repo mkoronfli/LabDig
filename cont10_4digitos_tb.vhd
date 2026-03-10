@@ -1,11 +1,9 @@
 -------------------------------------------------------------------------------
--- Arquivo   : cont10_tb.vhd
+-- Arquivo   : cont10_4digitos_tb.vhd
 -------------------------------------------------------------------------------
 -- Descricao : Testbench para o contador decimal com quatro testes        
 -------------------------------------------------------------------------------
--- Revisoes  :
---     Data        Versao  Autor                               Descricao
---     20/02/2026  1.0     Edson Midorikawa e Felipe Valencia  versao inicial
+-- Testbench adaptado do material cont10_tb, diponibilizado no moodle
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -15,19 +13,22 @@ use ieee.math_real.all;
 use std.textio.all;
 
 -- entidade do testbench
-entity cont10_tb is
+entity cont10_4digitos_tb is
 end entity;
 
-architecture tb of cont10_tb is
+architecture tb of cont10_4digitos_tb is
 
   -- Componente a ser testado (Device Under Test -- DUT)
   component cont10 is
       port (
-          clock   : in  std_logic;
-          clear   : in  std_logic;
-          enable  : in  std_logic;
-          Q       : out std_logic_vector(3 downto 0);
-          RCO     : out std_logic
+        clock   : in  std_logic;
+        clear   : in  std_logic;
+        enable  : in  std_logic;
+        Q0      : out std_logic_vector(3 downto 0);
+		    Q1      : out std_logic_vector(3 downto 0);
+		    Q2      : out std_logic_vector(3 downto 0);
+		    Q3      : out std_logic_vector(3 downto 0);
+        RCO     : out std_logic
       );
   end component;
   
@@ -37,8 +38,11 @@ architecture tb of cont10_tb is
   signal enable_in : std_logic := '0';
 
   ---- Declaracao dos sinais de saida
-  signal q_out      : std_logic_vector(3 downto 0) := (others => '0');
-  signal rco_out    : std_logic := '0';
+  signal q0_out      : std_logic_vector(3 downto 0) := (others => '0');
+  signal q1_out      : std_logic_vector(3 downto 0) := (others => '0');
+  signal q2_out      : std_logic_vector(3 downto 0) := (others => '0');
+  signal q3_out      : std_logic_vector(3 downto 0) := (others => '0');
+  signal rco_out     : std_logic := '0';
 
   -- Configurações do clock
   signal keep_simulating : std_logic := '0'; -- delimita o tempo de geração do clock
@@ -56,11 +60,14 @@ begin
   dut: cont10
       port map
       (
-          clock   =>  clock_in, 
-          clear   =>  clear_in,
-          enable  =>  enable_in,
-          Q       =>  q_out,
-          RCO     =>  rco_out
+          clock    =>  clock_in, 
+          clear    =>  clear_in,
+          enable   =>  enable_in,
+          Q0       =>  q0_out,
+          Q1       =>  q1_out,
+          Q2       =>  q2_out,
+          Q3       =>  q3_out,
+          RCO      =>  rco_out
       );
  
   ---- Gera sinais de estimulo para a simulacao
@@ -87,16 +94,43 @@ begin
     wait for 2*clockPeriod;
     wait until falling_edge(clock_in);
 
-    -- Teste #3: habilita contagem por 12 periodos de clock
-    -- resultados esperados: Q=varia de 0 a 9, volta para 0 e termina Q=2 e 
-    -- RCO permanece em 0, exceto quando Q=9
+    -- Teste #3: habilita contagem por 18 periodos de clock (teste de Q0 e Q1)
+    -- resultados esperados: Q0=varia de 0 a 9, Q1=varia de 1 até 8, Q2 e Q3 peranecem em 0
+    -- RCO permanece em 0
     caso      <= 3;
     enable_in <= '1';
-    wait for 12*clockPeriod;
+    wait for 18*clockPeriod;
     enable_in <= '0';
     wait until falling_edge(clock_in);
 
-    -- Teste 4: clear assincrono  
+    -- Teste #4: habilita contagem por 999 periodos de clock (teste de Q0, Q1 e Q2)
+    -- resultados esperados: Q0-Q2 variam de '0' a '999' (decimal), Q3 permanece em 0 
+    -- RCO permanece em 0
+    caso      <= 3;
+    enable_in <= '1';
+    wait for 999*clockPeriod;
+    enable_in <= '0';
+    wait until falling_edge(clock_in);
+
+    -- Teste #5: habilita contagem por 9999 periodos de clock (teste de Q0, Q1, Q2 e Q3)
+    -- resultados esperados: Q0-Q3 variam de '0' a '9999' (decimal)
+    -- RCO permanece em 0
+    caso      <= 3;
+    enable_in <= '1';
+    wait for 9999*clockPeriod;
+    enable_in <= '0';
+    wait until falling_edge(clock_in);
+
+    -- Teste #6: habilita contagem por 10000 periodos de clock (teste de RC0)
+    -- resultados esperados: Q0-Q3 variam de '0' a '9999' (decimal), depois zeram
+    -- RCO muda para 1, na última etapa
+    caso      <= 3;
+    enable_in <= '1';
+    wait for 10000*clockPeriod;
+    enable_in <= '0';
+    wait until falling_edge(clock_in);
+
+    -- Teste #7: clear assincrono  
     -- resultado esperado: Q=0 e RCO=0   
     caso     <= 4;
     clear_in <= '1';
