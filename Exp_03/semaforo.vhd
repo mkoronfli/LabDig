@@ -22,7 +22,7 @@ architecture arch of semaforo_uc is
     type tipo_Estado is (vermelho, amarelo, verde);
     signal E_ant, E_prox: tipo_Estado;
 begin
-    -- Mudança de estado
+    -- MudanÃ§a de estado
     process (clock, reset)
     begin  
         if reset = '1' then
@@ -52,24 +52,24 @@ begin
     -- Liga o enable e desliga o clear quando chega no estado correspondente
     
     with E_ant select en_vermelho<=
-        '1' when vermelho;
+        '1' when vermelho,
         '0' when others;
     with E_ant select clr_vermelho<=
-        '0' when vermelho;
+        '0' when vermelho,
         '1' when others;
 
     with E_ant select en_amarelo<=
-        '1' when amarelo;
+        '1' when amarelo,
         '0' when others;
     with E_ant select clr_amarelo<=
-        '0' when amarelo;
+        '0' when amarelo,
         '1' when others;
 
     with E_ant select en_verde<=
-        '1' when verde;
+        '1' when verde,
         '0' when others;
     with E_ant select clr_verde<=
-        '0' when verde;
+        '0' when verde,
         '1' when others;
 
 end architecture;
