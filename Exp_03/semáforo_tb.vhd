@@ -74,7 +74,7 @@ begin
     assert false report "inicio da simulacao" severity note;
     keep_simulating <= '1';  -- inicia geracao do sinal de clock
  
-    -- Teste #1: reset assíncrono
+    -- Teste #1: reset assÃ­ncrono
     -- Ativa reset por 20 periodos sem nenhum RCO ativo
     -- Resultado esperado: estado = vermelho, en_vermelho = 1, clr_vermelho =0
     --                              en amarelo = 0, en_verde = 0, clr_amarelo = 1, clr_verde = 1
@@ -93,8 +93,8 @@ begin
     wait for 20*clockPeriod;
     wait until falling_edge(clock_in);
 
-    -- Teste #3: transição vermelho para verde
-    -- Ativa rco_vermelho por 1 perídos e volta a 0
+    -- Teste #3: transiÃ§Ã£o vermelho para verde
+    -- Ativa rco_vermelho por 1 perÃ­dos e volta a 0
     -- Resultado esperado: estado = verde, en_verde = 1, clr_verde = 0
     --                     en_vermelho = 0, en_amarelo = 0, clr_vermelho = 1, clr_amarelo = 1
 
@@ -104,8 +104,8 @@ begin
     rco_vermelho_in  <= '0';
     wait until falling_edge(clock_in);
 
-    -- Teste #4: transição verde para amarelo
-    -- Ativa rco_verde por 1 período e volta a 0
+    -- Teste #4: transiÃ§Ã£o verde para amarelo
+    -- Ativa rco_verde por 1 perÃ­odo e volta a 0
     -- Resultado esperado: estado=amarelo, en_amarelo=1, clr_amarelo=0
     --                     en_vermelho=0, en_verde=0, clr_vermelho=1, clr_verde=1
 
@@ -116,7 +116,7 @@ begin
     wait until falling_edge(clock_in);
 
     -- Teste #5: transicao amarelo para vermelho
-    -- Ativa rco_amarelo por 1 período e volta a 0
+    -- Ativa rco_amarelo por 1 perÃ­odo e volta a 0
     -- Resultado esperado: estado=vermelho, en_vermelho=1, clr_vermelho=0
     --                     en_amarelo=0, en_verde=0, clr_amarelo=1, clr_verde=1
 
@@ -134,7 +134,7 @@ begin
     rco_vermelho_in <= '1';
     wait for clockPeriod;
     rco_vermelho_in <= '0';
-    wait for 50 clockPeriod;
+    wait for 50*clockPeriod;
     reset_in <= '1';
     wait for clockPeriod;
     reset_in <= '0';
