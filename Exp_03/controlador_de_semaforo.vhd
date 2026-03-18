@@ -18,7 +18,7 @@ architecture controlador_semaforo of semaforo is
 -- Sinais internos
     signal clr_vermelho_sig, clr_amarelo_sig, clr_verde_sig, 
            en_vermelho_sig, en_amarelo_sig, en_verde_sig,
-           rco_vermelho_sig, rco_amarelo_sig, rco_verde_sig: : std_logic;
+           rco_vermelho_sig, rco_amarelo_sig, rco_verde_sig:  std_logic;
     signal Q_vermelho, Q_amarelo, Q_verde: std_logic_vector(14 downto 0);              
 
 -- Componentes
@@ -53,9 +53,9 @@ end component semaforo_uc;
 
 begin
 
-VERMELHO: contador 
+VERM: contador 
     generic map (
-        MODULO 5000
+        MODULO => 5000
     )
     port map(
 	    clock => clock, -- Clock ligado ao clock global
@@ -65,9 +65,9 @@ VERMELHO: contador
 	    RCO => rco_vermelho_sig
 	);
 
-AMARELO: contador 
+AMAR: contador 
     generic map (
-        MODULO 2000
+        MODULO => 2000
     )
     port map(
 	    clock => clock, -- Clock ligado ao clock global
@@ -77,9 +77,9 @@ AMARELO: contador
 	    RCO => rco_amarelo_sig
 	);
 
-VERDE: contador 
+VERD: contador 
     generic map (
-        MODULO 4000
+        MODULO => 4000
     )
     port map(
 	    clock => clock, -- Clock ligado ao clock global
