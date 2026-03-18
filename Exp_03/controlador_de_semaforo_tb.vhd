@@ -9,11 +9,7 @@ architecture tb of semaforo_tb is
 
 -- Componente a ser testado (Device Under Test -- DUT)
   component semaforo is
-    generic (
-        MODULO_VERMELHO : integer := 1000;
-        MODULO_VERDE    : integer := 1000;
-        MODULO_AMARELO  : integer := 1000
-    );
+    
     port (
         clock    : in  std_logic;
         reset    : in  std_logic;
