@@ -61,6 +61,59 @@ begin
     assert false report "inicio da simulacao" severity note;
     keep_simulating <= '1';  -- inicia geracao do sinal de clock
 
+    -- Teste #1: reset assincrono inicial
+    -- Ativa reset por 20 periodos
+    -- Resultado esperado: vermelho = 1, amarelo = 0, verde = 0
+
+    caso     <= 1;
+    reset_in <= '1';
+    wait for 20*clockPeriod;
+    reset_in <= '0';
+    wait until falling_edge(clock_in);
+
+    -- Teste #2: periodo completo de vermelho
+    -- Aguarda 5000 periodos de clock (5 segundos a 1kHz)
+    -- Resultado esperado: vermelho = 1, apenas no final muda para o verde
+
+    caso <= 2;
+    wait for 5000*clockPeriod;
+    wait until falling_edge(clock_in);
+
+    -- Teste #3: periodo completo de verde
+    -- Aguarda 4000 periodos de clock (4 segundos a 1kHz)
+    -- Resultado esperado: verde = 1, apenas no final muda para o amarelo
+
+    caso <= 3;
+    wait for 4000*clockPeriod;
+    wait until falling_edge(clock_in);
+ 
+    -- Teste #4: periodo completo de amarelo
+    -- Aguarda 2000 periodos de clock (2 segundos a 1kHz)
+    -- Resultado esperado: amarelo = 1 apenas, no final muda para o vermelho
+
+    caso <= 4;
+    wait for 2000*clockPeriod;
+    wait until falling_edge(clock_in);
+
+    -- Teste #5: inicio do segundo ciclo
+    -- Confirma que o ciclo recomeca corretamente apos o ciclo completo
+    -- Resultado esperado: vermelho = 1, apenas no final muda para o verde
+
+    caso <= 5;
+    wait for 5000*clockPeriod;
+    wait until falling_edge(clock_in);
+
+    -- Teste #6: reset assincrono no meio do estado verde
+    -- Aguarda apenas 500 ciclos dentro do verde e entao ativa reset
+    -- Resultado esperado: vermelho = 1, verde = 0, amarelo = 0 imediatamente (interrompe o ciclo)
+
+    caso <= 6;
+    wait for 500*clockPeriod;
+    reset_in <= '1';
+    wait for 2*clockPeriod;
+    reset_in <= '0';
+    wait until falling_edge(clock_in);
+
 -- tempo ate final do testbench (5 periodos de clock)
     caso <= 99;
     wait for 5*clockPeriod;
