@@ -17,7 +17,7 @@ architecture sim of tb_interface_leds_botoes is
             pulso      : out std_logic;
             erro       : out std_logic;
             pronto     : out std_logic;
-            estado_out : out std_logic_vector(3 downto 0) -- Sinal de depuração
+            estado_out : out std_logic_vector(3 downto 0) -- Sinal de depuracao
         );
     end component;
 
@@ -34,11 +34,15 @@ architecture sim of tb_interface_leds_botoes is
     signal pronto     : std_logic;
     signal estado_out : std_logic_vector(3 downto 0);
 
-    constant CLK_PERIOD : time := 1 sec;
+    signal keep_simulating : std_logic := '0';
+    constant clockPeriod : time := 1 ms;
 
 begin
 
-    -- Instanciação do componente
+    clock_in <= (not clock_in) and keep_simulating after clockPeriod/2;
+
+
+    -- Instanciacao do componente
     DUT: interface_leds_botoes
         port map (
             clock      => clock,
@@ -53,58 +57,62 @@ begin
             estado_out => estado_out
         );
 
-    -- Geração do sinal de Clock (1 Hz)
-    clk_process : process
-    begin
-        clock <= '0';
-        wait for CLK_PERIOD / 2;
-        clock <= '1';
-        wait for CLK_PERIOD / 2;
-    end process;
-
-    -- Processo de estímulos
+    -- Processo de estimulos
     stim_process : process
     begin
-        -- INICIALIZAÇÃO E RESET
+        keep_simulating <= '1';
+
+        -- CASO 0: INICIALIZACAO E RESET
         reset <= '1';
         iniciar <= '0';
         resposta <= '0';
-        wait for CLK_PERIOD * 2;
+        wait for clockPeriod*2;
         reset <= '0';
-        wait for CLK_PERIOD;
+        wait for clockPeriod;
 
         -- CASO 1: JOGADA CORRETA 
         iniciar <= '1';
-        wait for CLK_PERIOD;
+        wait for clockPeriod;
         iniciar <= '0';
 
-        wait for CLK_PERIOD * 11; 
-        
-        
-        wait for CLK_PERIOD * 3;
-        resposta <= '1';
-        wait for CLK_PERIOD;
-        
-        resposta <= '0';
-        
-        wait for CLK_PERIOD * 3;
+        wait for clockPeriod*11; 
+        -- espera-se que o sinal de estÃ­mulo ligue (apos 10 periodos de clock)
 
-        -- CASO 2: JOGADA INVÁLIDA (ERRO) 
+        wait for clockPeriod*3; -- tempo de reacao
+        resposta <= '1';
+        wait for clockPeriod*5;
+        resposta <= '0';
+
+        wait for clockPeriod*3;
+        -- saidas esperadas: erro = '0' e pronto = '1'
+
+        -- CASO 2: JOGADA INVALIDA (ERRO) 
         iniciar <= '1';
-        wait for CLK_PERIOD;
+        wait for clockPeriod;
         iniciar <= '0';
-        
-        wait for CLK_PERIOD * 4;
+
+        wait for clockPeriod*5; 
+        -- contagem do tempo de espera nao termina
         
         resposta <= '1';
-        
-        wait for CLK_PERIOD * 4;
-        
+        wait for clockPeriod*5;
         resposta <= '0';
         
-        wait for CLK_PERIOD * 3;
+        wait for clockPeriod*3;
+        -- saidas esperadas: erro = '1', pronto = '0', pulso sempre em '0'
 
-        -- Fim da simulação
+        -- CASO 3: RESET APOS ERRO
+        reset <= '1';
+        iniciar <= '0';
+        resposta <= '0';
+        wait for clockPeriod*2;
+        reset <= '0';
+        wait for clockPeriod;
+
+        -- Fim da simulacao
+
+        keep_simulating <= '0';
+
         wait;
     end process;
 
