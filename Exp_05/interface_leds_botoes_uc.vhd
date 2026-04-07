@@ -23,7 +23,7 @@ architecture fsm of interface_leds_botoes_uc is
     signal state, next_state : state_type;
 begin
 
-    -- Memória de estado
+    -- Memoria de estado
     process(clock, reset)
     begin
         if reset = '1' then
@@ -33,7 +33,7 @@ begin
         end if;
     end process;
 
-    -- Lógica de próximo estado
+    -- Logica de proximo estado
     process(state, iniciar, resposta, rco)
     begin
         next_state <= state; 
@@ -61,7 +61,7 @@ begin
         end case;
     end process;
 
-    -- Lógica de saída
+    -- Logica de saoda
     process(state)
     begin
         zeraCont  <= '0';
