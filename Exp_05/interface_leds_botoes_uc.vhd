@@ -85,17 +85,17 @@ begin
             when MEDE =>
                 ligado   <= '1';
                 estimulo <= '1';
-                estado   <= "0100";
+                estado   <= "0011";
                 
             when FINAL =>
                 ligado   <= '1';
                 estimulo <= '1';
                 pronto   <= '1';
-                estado   <= "1000";
+                estado   <= "0100";
                 
             when INVALIDA =>
                 erro   <= '1';
-                estado <= "1111";
+                estado <= "0101";
                 
         end case;
     end process;
