@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity tb_interface_leds_botoes is
 end entity tb_interface_leds_botoes;
@@ -39,7 +40,7 @@ architecture sim of tb_interface_leds_botoes is
 
 begin
 
-    clock_in <= (not clock_in) and keep_simulating after clockPeriod/2;
+    clock <= (not clock) and keep_simulating after clockPeriod/2;
 
 
     -- Instanciacao do componente
@@ -75,7 +76,7 @@ begin
         wait for clockPeriod;
         iniciar <= '0';
 
-        wait for clockPeriod*11; 
+        wait for clockPeriod*10; 
         -- espera-se que o sinal de estímulo ligue (apos 10 periodos de clock)
 
         wait for clockPeriod*3; -- tempo de reacao
@@ -90,6 +91,7 @@ begin
         iniciar <= '1';
         wait for clockPeriod;
         iniciar <= '0';
+        
 
         wait for clockPeriod*5; 
         -- contagem do tempo de espera nao termina
