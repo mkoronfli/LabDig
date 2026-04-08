@@ -12,7 +12,7 @@ entity interface_leds_botoes is
         pulso      : out std_logic;
         erro       : out std_logic;
         pronto     : out std_logic;
-        estado_out : out std_logic_vector(3 downto 0) 
+        db_estado : out std_logic_vector(3 downto 0) 
     );
 end entity interface_leds_botoes;
 
@@ -69,7 +69,7 @@ begin
             estimulo  => s_estimulo,
             erro      => erro,
             pronto    => pronto,
-            estado    => estado_out
+            estado    => db_estado
         );
 
     -- Instanciamento do Contador
