@@ -55,7 +55,7 @@ architecture estrutural of interface_leds_botoes is
 
 begin
 
-    -- Instanciação da UC
+    -- Instanciamento da UC
     UC: interface_leds_botoes_uc
         port map (
             clock     => clock,
@@ -72,8 +72,8 @@ begin
             estado    => estado_out
         );
 
-    -- Instanciação do FD
-    FD: cont10
+    -- Instanciamento do Contador
+    CONT: cont10
         port map (
             clock   => clock,
             clear   => s_zeraCont,
