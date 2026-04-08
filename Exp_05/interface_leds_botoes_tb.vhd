@@ -18,7 +18,8 @@ architecture sim of tb_interface_leds_botoes is
             pulso      : out std_logic;
             erro       : out std_logic;
             pronto     : out std_logic;
-            estado_out : out std_logic_vector(3 downto 0) -- Sinal de depuracao
+            db_estado  : out std_logic_vector(3 downto 0); -- Sinal de depuracao
+            db_rco     : out std_logic
         );
     end component;
 
@@ -34,6 +35,7 @@ architecture sim of tb_interface_leds_botoes is
     signal erro       : std_logic;
     signal pronto     : std_logic;
     signal estado_out : std_logic_vector(3 downto 0);
+    signal db_rco     : std_logic;
 
     signal keep_simulating : std_logic := '0';
     constant clockPeriod : time := 1 s;
@@ -55,7 +57,8 @@ begin
             pulso      => pulso,
             erro       => erro,
             pronto     => pronto,
-            estado_out => estado_out
+            db_estado => estado_out,
+            db_rco => db_rco
         );
 
     -- Processo de estimulos
