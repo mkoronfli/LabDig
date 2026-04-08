@@ -12,7 +12,8 @@ entity interface_leds_botoes is
         pulso      : out std_logic;
         erro       : out std_logic;
         pronto     : out std_logic;
-        db_estado : out std_logic_vector(3 downto 0) 
+        db_estado  : out std_logic_vector(3 downto 0);
+        db_rco     : out std_logic
     );
 end entity interface_leds_botoes;
 
@@ -93,5 +94,6 @@ begin
 
     estimulo <= s_estimulo;
     pulso    <= s_pulso;
+    db_rco <= s_rco;
 
 end architecture estrutural;
