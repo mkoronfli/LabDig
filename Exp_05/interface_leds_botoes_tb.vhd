@@ -36,7 +36,7 @@ architecture sim of tb_interface_leds_botoes is
     signal estado_out : std_logic_vector(3 downto 0);
 
     signal keep_simulating : std_logic := '0';
-    constant clockPeriod : time := 1 ms;
+    constant clockPeriod : time := 1 s;
 
 begin
 
