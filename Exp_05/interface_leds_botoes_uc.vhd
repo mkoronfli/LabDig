@@ -19,50 +19,50 @@ entity interface_leds_botoes_uc is
 end entity interface_leds_botoes_uc;
 
 architecture fsm of interface_leds_botoes_uc is
-    type state_type is (INICIAL, ESPERA, MEDE, FINAL, INVALIDA);
-    signal state, next_state : state_type;
+    type tipo_estado is (INICIAL, ESPERA, MEDE, FINAL, INVALIDA);
+    signal estado_atual, proximo_estado : tipo_estado;
 begin
 
-    -- Memoria de estado
+    -- Memória de estado
     process(clock, reset)
     begin
         if reset = '1' then
-            state <= INICIAL;
+            estado_atual <= INICIAL;
         elsif rising_edge(clock) then
-            state <= next_state;
+            estado_atual <= proximo_estado;
         end if;
     end process;
 
-    -- Logica de proximo estado
-    process(state, iniciar, resposta, rco)
+    -- Lógica de próximo estado
+    process(estado_atual, iniciar, resposta, rco)
     begin
-        next_state <= state; 
+        proximo_estado <= estado_atual; 
         
-        case state is
+        case estado_atual is
             when INICIAL =>
-                if iniciar = '1' then next_state <= ESPERA; end if;
+                if iniciar = '1' then proximo_estado <= ESPERA; end if;
             
             when ESPERA =>
-                if resposta = '1' then next_state <= INVALIDA;
-                elsif rco = '1' then next_state <= MEDE;       
+                if resposta = '1' then proximo_estado <= INVALIDA;
+                elsif rco = '1' then proximo_estado <= MEDE;       
                 end if;
                 
             when MEDE =>
-                if resposta = '1' then next_state <= FINAL; end if;
+                if resposta = '1' then proximo_estado <= FINAL; end if;
                 
             when FINAL =>
-                next_state <= INICIAL; 
+                proximo_estado <= INICIAL; 
                 
             when INVALIDA =>
-                if resposta = '0' then next_state <= INICIAL; end if;
+                if resposta = '0' then proximo_estado <= INICIAL; end if;
                 
             when others =>
-                next_state <= INICIAL;
+                proximo_estado <= INICIAL;
         end case;
     end process;
 
-    -- Logica de saoda
-    process(state)
+    -- Lógica de saída
+    process(estado_atual)
     begin
         zeraCont  <= '0';
         contaCont <= '0';
@@ -72,7 +72,7 @@ begin
         pronto    <= '0';
         estado    <= "0000"; 
 
-        case state is
+        case estado_atual is
             when INICIAL =>
                 zeraCont <= '1';
                 estado   <= "0001";
@@ -85,17 +85,17 @@ begin
             when MEDE =>
                 ligado   <= '1';
                 estimulo <= '1';
-                estado   <= "0011";
+                estado   <= "0100";
                 
             when FINAL =>
                 ligado   <= '1';
                 estimulo <= '1';
                 pronto   <= '1';
-                estado   <= "0100";
+                estado   <= "1000";
                 
             when INVALIDA =>
                 erro   <= '1';
-                estado <= "0101";
+                estado <= "1111";
                 
         end case;
     end process;
