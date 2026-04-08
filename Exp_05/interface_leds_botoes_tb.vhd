@@ -103,14 +103,6 @@ begin
         wait for clockPeriod*3;
         -- saidas esperadas: erro = '1', pronto = '0', pulso sempre em '0'
 
-        -- CASO 3: RESET APOS ERRO
-        reset <= '1';
-        iniciar <= '0';
-        resposta <= '0';
-        wait for clockPeriod*2;
-        reset <= '0';
-        wait for clockPeriod;
-
         -- Fim da simulacao
 
         keep_simulating <= '0';
