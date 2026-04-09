@@ -62,42 +62,36 @@ begin
     end process;
 
     -- Lógica de saída
-    process(estado_atual)
-    begin
-        zeraCont  <= '0';
-        contaCont <= '0';
-        ligado    <= '0';
-        estimulo  <= '0';
-        erro      <= '0';
-        pronto    <= '0';
-        estado    <= "0000"; 
+    with estado_atual select
+        zeraCont <= '1' when INICIAL,
+                    '0' when others;
 
-        case estado_atual is
-            when INICIAL =>
-                zeraCont <= '1';
-                estado   <= "0001";
-                
-            when ESPERA =>
-                ligado    <= '1';
-                contaCont <= '1';
-                estado    <= "0010";
-                
-            when MEDE =>
-                ligado   <= '1';
-                estimulo <= '1';
-                estado   <= "0100";
-                
-            when FINAL =>
-                ligado   <= '1';
-                estimulo <= '1';
-                pronto   <= '1';
-                estado   <= "1000";
-                
-            when INVALIDA =>
-                erro   <= '1';
-                estado <= "1111";
-                
-        end case;
-    end process;
+    with estado_atual select
+        contaCont <= '1' when ESPERA,
+                     '0' when others;
+
+    with estado_atual select
+        ligado <= '1' when ESPERA | MEDE | FINAL,
+                  '0' when others;
+
+    with estado_atual select
+        estimulo <= '1' when MEDE | FINAL,
+                    '0' when others;
+
+    with estado_atual select
+        erro <= '1' when INVALIDA,
+                '0' when others;
+
+    with estado_atual select
+        pronto <= '1' when FINAL,
+                  '0' when others;
+
+    with estado_atual select
+        estado <= "0001" when INICIAL,
+                  "0010" when ESPERA,
+                  "0100" when MEDE,
+                  "1000" when FINAL,
+                  "1111" when INVALIDA,
+                  "0000" when others;
 
 end architecture fsm;
