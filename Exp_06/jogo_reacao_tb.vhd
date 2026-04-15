@@ -2,10 +2,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity tb_interface_leds_botoes is
-end entity tb_interface_leds_botoes;
+entity jogo_reacao_tb is
+end entity jogo_reacao_tb;
 
-architecture sim of tb_interface_leds_botoes is
+architecture sim of jogo_reacao_tb is
 
     component jogo_reacao is
     port (
