@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity interface_leds_botoes is
     port (
@@ -36,27 +37,16 @@ architecture estrutural of interface_leds_botoes is
         );
     end component;
 
-    -- Declaração do componente do fluxo de dados
-    component cont10 is
-        port (
-            clock   : in  std_logic;
-            clear   : in  std_logic;
-            enable  : in  std_logic;
-            Q       : out std_logic_vector(3 downto 0);
-            RCO     : out std_logic
-        );
-    end component;
-
-    -- Sinais internos para interligar os blocos
     signal s_rco       : std_logic;
     signal s_zeraCont  : std_logic;
     signal s_contaCont : std_logic;
     signal s_estimulo  : std_logic;
     signal s_pulso     : std_logic;
+    
+    signal cont_5s : integer range 0 to 4999;
 
 begin
 
-    -- Instanciamento da UC
     UC: interface_leds_botoes_uc
         port map (
             clock     => clock,
@@ -73,15 +63,27 @@ begin
             estado    => db_estado
         );
 
-    -- Instanciamento do Contador
-    CONT: cont10
-        port map (
-            clock   => clock,
-            clear   => s_zeraCont,
-            enable  => s_contaCont,
-            Q       => open,       
-            RCO     => s_rco       
-        );
+    process(clock, reset)
+    begin
+        if reset = '1' then
+            cont_5s <= 0;
+            s_rco <= '0';
+        elsif rising_edge(clock) then
+            if s_zeraCont = '1' then
+                cont_5s <= 0;
+                s_rco <= '0';
+            elsif s_contaCont = '1' then
+                if cont_5s = 4999 then
+                    s_rco <= '1';
+                else
+                    cont_5s <= cont_5s + 1;
+                    s_rco <= '0';
+                end if;
+            else
+                s_rco <= '0';
+            end if;
+        end if;
+    end process;
 
     process(s_estimulo, resposta, reset)
     begin
@@ -94,6 +96,6 @@ begin
 
     estimulo <= s_estimulo;
     pulso    <= s_pulso;
-    db_rco <= s_rco;
+    db_rco   <= s_rco;
 
 end architecture estrutural;
