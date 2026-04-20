@@ -7,7 +7,7 @@ entity medidor_largura is
         reset : in std_logic;
         liga : in std_logic;
         sinal : in std_logic;
-	tempo : out std_logic_vector(15 downto 0);
+	    tempo : out std_logic_vector(15 downto 0);
         display0 : out std_logic_vector(6 downto 0);
         display1 : out std_logic_vector(6 downto 0);
         display2 : out std_logic_vector(6 downto 0);
@@ -72,7 +72,7 @@ DISPLAY5: hex7seg
         display => db_estado -- saida no display conectado ao sistema
     );
 
-CNTROLADOR: controlador
+CONTROLADOR: controlador
     port map (
         clock => clock,
         reset => reset,
