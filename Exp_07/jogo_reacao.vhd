@@ -65,8 +65,12 @@ architecture estrutural of jogo_reacao is
     signal s_pulso    : std_logic;
     signal s_erro     : std_logic;
     signal s_pronto   : std_logic;
+    signal s_db_estado: std_logic_vector(3 downto 0);
 
     signal s_disp0, s_disp1, s_disp2, s_disp3 : std_logic_vector(6 downto 0);
+    signal s_tempo_1                          : std_logic_vector(15 downto 0);
+    signal s_tempo_2                          : std_logic_vector(15 downto 0);
+    signal s_win                              : std_logic;
 
 begin
 
@@ -81,21 +85,41 @@ begin
             pulso      => s_pulso,
             erro       => s_erro,
             pronto     => s_pronto,
-            db_estado  => db_estado,       
+            db_estado  => s_db_estado,       
             db_rco     => open
         );
 
-    MEDIDOR : medidor_largura
+    MEDIDOR_1 : medidor_largura
         port map (
             clock        => clock,
             reset        => reset,
             liga         => s_ligado, 
             sinal        => s_pulso,  
-            tempo        => open,     
-            display0     => s_disp0,
-            display1     => s_disp1,
-            display2     => s_disp2,
-            display3     => s_disp3,
+            tempo        => s_tempo_1,     
+            display0     => open,
+            display1     => open,
+            display2     => open,
+            display3     => open,
+            db_estado    => open,
+            pronto       => open,
+            fim          => open,
+            db_clock     => open,
+            db_sinal     => open,
+            db_zeraCont  => open,
+            db_contaCont => open
+        );
+
+    MEDIDOR_2: medidor_largura
+        port map (
+            clock        => clock,
+            reset        => reset,
+            liga         => s_ligado, 
+            sinal        => s_pulso,  
+            tempo        => s_tempo_2,     
+            display0     => open,
+            display1     => open,
+            display2     => open,
+            display3     => open,
             db_estado    => open,
             pronto       => open,
             fim          => open,
@@ -110,10 +134,20 @@ begin
     display2 <= "0010000" when s_erro = '1' else s_disp2;
     display3 <= "0010000" when s_erro = '1' else s_disp3;
 
+    s_win <= '0' when ( s_db_estado = "1000" AND s_tempo_1 < s_tempo_2) else
+             '1' when ( s_db_estado = "1000" AND s_tempo_1 > s_tempo_2);
+
+    display3 <=  "1010101" when s_db_estado = "1000";
+    display2 <=  "1111001" when s_db_estado = "1000";
+    display1 <=  "1001000" when s_db_estado = "1000";
+    display 0 <= "1111001" when (s_db_estado = "1000" and s_win = '0') else
+                 "0100100" when (s_db_estado = "1000" and s_win = '1');
+
     ligado   <= s_ligado;
     pulso    <= s_pulso;
     estimulo <= s_estimulo;
     erro     <= s_erro;
     pronto   <= s_pronto;
+    db_estado <= s_db_estado;
 
 end architecture estrutural;
