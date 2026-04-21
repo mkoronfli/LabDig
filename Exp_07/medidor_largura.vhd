@@ -72,7 +72,7 @@ DISPLAY5: hex7seg
         display => db_estado -- saida no display conectado ao sistema
     );
 
-CONTROLADOR: controlador
+CNTROLADOR: controlador
     port map (
         clock => clock,
         reset => reset,
