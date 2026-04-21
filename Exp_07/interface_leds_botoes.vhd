@@ -38,21 +38,21 @@ architecture estrutural of interface_leds_botoes is
     end component;
 
     component gerador_pseudo_aleatorio is
-    port (
-        enable: in std_logic;
-	    lfsr_state : in std_logic_vector(2 downto 0) := "011"; 
-	    lfsr_out : out std_logic_vector(2 downto 0)
-    );
+        port (
+            clock    : in  std_logic;
+            reset    : in  std_logic;
+            lfsr_out : out std_logic_vector(2 downto 0)
+        );
     end component;
 
-    signal s_rco       : std_logic;
-    signal s_zeraCont  : std_logic;
-    signal s_contaCont : std_logic;
-    signal s_estimulo  : std_logic;
-    signal s_pulso     : std_logic;
-    
-    signal cont_temp : integer range 0 to 6999;
-    signal s_lfsr      : std_logic_vector(2 downto 0);
+    signal s_rco        : std_logic;
+    signal s_zeraCont   : std_logic;
+    signal s_contaCont  : std_logic;
+    signal s_estimulo   : std_logic;
+    signal s_pulso      : std_logic;
+    signal cont_temp    : integer range 0 to 7999;
+    signal s_lfsr       : std_logic_vector(2 downto 0);
+    signal s_tempo_alvo : integer range 0 to 7999;
 
 begin
 
@@ -74,8 +74,8 @@ begin
 
     TEMP: gerador_pseudo_aleatorio
         port map (
-            enable => s_contaCont,
-            lfsr_state => open,
+            clock    => clock,
+            reset    => reset,
             lfsr_out => s_lfsr
         );
 
@@ -84,12 +84,20 @@ begin
         if reset = '1' then
             cont_temp <= 0;
             s_rco <= '0';
+            s_tempo_alvo <= 1000;
         elsif rising_edge(clock) then
             if s_zeraCont = '1' then
                 cont_temp <= 0;
                 s_rco <= '0';
+                
+                if s_lfsr = "000" then
+                    s_tempo_alvo <= 1000;
+                else
+                    s_tempo_alvo <= to_integer(unsigned(s_lfsr)) * 1000;
+                end if;
+                
             elsif s_contaCont = '1' then
-                if cont_temp = (to_integer(unsigned(s_lfsr)) * 1000) - 1 then
+                if cont_temp = s_tempo_alvo - 1 then
                     s_rco <= '1';
                 else
                     cont_temp <= cont_temp + 1;
