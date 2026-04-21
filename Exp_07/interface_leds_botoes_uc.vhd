@@ -51,7 +51,7 @@ begin
                 if resposta = '1' then proximo_estado <= FINAL; end if;
                 
             when FINAL =>
-                if reset = '1' then proximo_estado <= INICIAL; 
+                if reset = '1' then proximo_estado <= INICIAL; end if;
                 
             when INVALIDA =>
                 if resposta = '0' then proximo_estado <= INICIAL; end if;
