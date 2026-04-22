@@ -12,6 +12,7 @@ entity jogo_reacao is
         display1   : out std_logic_vector(6 downto 0);
         display2   : out std_logic_vector(6 downto 0);
         display3   : out std_logic_vector(6 downto 0);
+		  display5   : out std_logic_vector(6 downto 0);
         ligado     : out std_logic;
         pulso      : out std_logic;
         estimulo   : out std_logic;
@@ -69,6 +70,7 @@ architecture estrutural of jogo_reacao is
     signal s_db_estado: std_logic_vector(3 downto 0);
 
     signal s_disp1_0, s_disp1_1, s_disp1_2, s_disp1_3 : std_logic_vector(6 downto 0);
+	 signal s_disp2_0, s_disp2_1, s_disp2_2, s_disp2_3 : std_logic_vector(6 downto 0);
     signal s_tempo_1                          : std_logic_vector(15 downto 0);
     signal s_tempo_2                          : std_logic_vector(15 downto 0);
     signal s_win                              : std_logic;
@@ -145,10 +147,10 @@ begin
             liga         => s_ligado, 
             sinal        => s_pulso_2,  
             tempo        => s_tempo_2,     
-            display0     => open,
-            display1     => open,
-            display2     => open,
-            display3     => open,
+            display0     => s_disp2_0,
+            display1     => s_disp2_1,
+            display2     => s_disp2_2,
+            display3     => s_disp2_3,
             db_estado    => open,
             pronto       => open,
             fim          => open,
@@ -160,20 +162,23 @@ begin
 
     s_win <= '0' when s_tempo_1 <= s_tempo_2 else '1';
 
-    display3 <= "1010101" when s_db_estado = "1000" else
-                "0010000" when s_erro = '1' else s_disp1_3;
+    display0 <= "0010000" when s_erro = '1' else 
+                s_disp1_0 when s_win = '0'  else s_disp2_0;
 
-    display2 <= "1111001" when s_db_estado = "1000" else
-                "0010000" when s_erro = '1' else s_disp1_2;
+    display1 <= "0010000" when s_erro = '1' else 
+                s_disp1_1 when s_win = '0'  else s_disp2_1;
 
-    display1 <= "1001000" when s_db_estado = "1000" else
-                "0010000" when s_erro = '1' else s_disp1_1;
+    display2 <= "0010000" when s_erro = '1' else 
+                s_disp1_2 when s_win = '0'  else s_disp2_2;
 
-    display0 <= "1111001" when (s_db_estado = "1000" and s_win = '0') else
-                "0100100" when (s_db_estado = "1000" and s_win = '1') else
-                "0010000" when s_erro = '1' else s_disp1_0;
+    display3 <= "0010000" when s_erro = '1' else 
+                s_disp1_3 when s_win = '0'  else s_disp2_3;
 
-    ligado   <= s_ligado;
+    display5 <= "1111001" when (s_db_estado = "1000" and s_win = '0') else 
+                "0100100" when (s_db_estado = "1000" and s_win = '1') else 
+					 "1111111";
+	 
+	 ligado   <= s_ligado;
     pulso    <= s_pulso_1 or s_pulso_2;
     estimulo <= s_estimulo;
     erro     <= s_erro;
