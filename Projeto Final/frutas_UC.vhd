@@ -19,7 +19,7 @@ architecture fsm of frutas_uc is
     signal estado_atual, proximo_estado : tipo_estado;
 begin
 
-    -- Mem贸ria de estado
+    -- Mem髍ia de estado
     process(clock, reset)
     begin
         if reset = '1' then
@@ -29,7 +29,7 @@ begin
         end if;
     end process;
 
-    -- L贸gica de pr贸ximo estado
+    -- L骻ica de pr髕imo estado
     process(estado_atual, iniciar, pos_valida, erro)
     begin
         proximo_estado <= estado_atual; 
@@ -53,19 +53,19 @@ begin
         end case;
     end process;
 
-    -- L贸gica de sa铆da
+    -- L骻ica de sa韉a
     with estado_atual select
         gera_fruta <= '1' when GERA,
                       '0' when others;
-                      
+
     with estado_atual select
         mostra_fruta <= '1' when MOSTRA,
                       '0' when others;
 
     with estado_atual select
-        estado <= "00" when ESPERA,
-                  "01" when GERA,
-                  "10" when MOSTRA,
-                  "11" when others;
+        db_estado <= "00" when ESPERA,  
+                     "01" when GERA,
+                     "10" when MOSTRA,
+                     "11" when others;
 
 end architecture;
