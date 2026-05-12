@@ -102,7 +102,7 @@ begin
         );
 
     -- Gerador Pseudo-aleatório
-    GEN_FRUTA: gerador_de_frutas
+    GER_FRUTA: gerador_de_frutas
         port map (
             clock     => clock,
             reset     => s_reset_logic,
