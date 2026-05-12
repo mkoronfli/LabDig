@@ -162,16 +162,20 @@ begin
 
     s_win <= '0' when s_tempo_1 <= s_tempo_2 else '1';
 
-    display0 <= "0010000" when s_erro = '1' else 
+    display0 <= "1000000" when (s_db_estado = "0001" or s_db_estado = "0010" or s_db_estado = "0100") else
+		"0010000" when s_erro = '1' else 
                 s_disp1_0 when s_win = '0'  else s_disp2_0;
 
-    display1 <= "0010000" when s_erro = '1' else 
+    display1 <= "1000000" when (s_db_estado = "0001" or s_db_estado = "0010" or s_db_estado = "0100") else
+		"0010000" when s_erro = '1' else 
                 s_disp1_1 when s_win = '0'  else s_disp2_1;
 
-    display2 <= "0010000" when s_erro = '1' else 
+    display2 <= "1000000" when (s_db_estado = "0001" or s_db_estado = "0010" or s_db_estado = "0100") else
+		"0010000" when s_erro = '1' else 
                 s_disp1_2 when s_win = '0'  else s_disp2_2;
 
-    display3 <= "0010000" when s_erro = '1' else 
+    display3 <= "1000000" when (s_db_estado = "0001" or s_db_estado = "0010" or s_db_estado = "0100") else
+		"0010000" when s_erro = '1' else 
                 s_disp1_3 when s_win = '0'  else s_disp2_3;
 
     display5 <= "1111001" when (s_db_estado = "1000" and s_win = '0') else 
