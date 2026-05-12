@@ -8,6 +8,7 @@ entity frutas_uc is
         iniciar    : in  std_logic;
         pos_valida : in  std_logic;
         erro       : in  std_logic; 
+        mostra_fruta : out std_logic;
         gera_fruta : out std_logic;
         db_estado  : out std_logic_vector(1 downto 0)
     );
@@ -54,7 +55,11 @@ begin
 
     -- Lógica de saída
     with estado_atual select
-        gera_fruta <= '1' when MOSTRA,
+        gera_fruta <= '1' when GERA,
+                      '0' when others;
+                      
+    with estado_atual select
+        mostra_fruta <= '1' when MOSTRA,
                       '0' when others;
 
     with estado_atual select
