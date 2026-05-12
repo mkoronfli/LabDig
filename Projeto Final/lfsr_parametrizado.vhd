@@ -8,6 +8,7 @@ entity gerador_pseudo_aleatorio is
     port (
         clock    : in  std_logic;
         reset    : in  std_logic;
+        enable   : in  std_logic;
         lfsr_out : out std_logic_vector(N-1 downto 0)
     );
 end entity;
