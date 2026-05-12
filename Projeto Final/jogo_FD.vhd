@@ -7,7 +7,7 @@ entity jogo_FD is
         clock       : in  std_logic;
         clock_slow  : in  std_logic;
         reset       : in  std_logic;
-        comandos_uc : in  std_logic_vector(1 downto 0); -- Sinais da UC
+        comandos_uc : in  std_logic_vector(1 downto 0); 
         btn_up      : in  std_logic;
         btn_down    : in  std_logic;
         btn_left    : in  std_logic;
@@ -22,15 +22,63 @@ entity jogo_FD is
 end entity jogo_FD;
 
 architecture estrutural of jogo_FD is
+
+    component posicao is
+        port (
+            clock_slow : in  std_logic;
+            reset      : in  std_logic;
+            btn_up     : in  std_logic;
+            btn_down   : in  std_logic;
+            btn_left   : in  std_logic;
+            btn_right  : in  std_logic;
+            pos_x      : out std_logic_vector(6 downto 0);
+            pos_y      : out std_logic_vector(5 downto 0)
+        );
+    end component;
+
+    component colisao_detect is
+        port (
+            posicao_x      : in  std_logic_vector(6 downto 0);
+            posicao_y      : in  std_logic_vector(5 downto 0);
+            fruta_x        : in  std_logic_vector(6 downto 0);
+            fruta_y        : in  std_logic_vector(5 downto 0);
+            colisao_fruta  : out std_logic;
+            colisao_parede : out std_logic
+        );
+    end component;
+
+    component gerador_de_frutas is
+        port (
+            clock      : in  std_logic;
+            reset      : in  std_logic;
+            posicao_x  : in  std_logic_vector(6 downto 0);
+            posicao_y  : in  std_logic_vector(5 downto 0);
+            fruta_x    : out std_logic_vector(6 downto 0);
+            fruta_y    : out std_logic_vector(5 downto 0);
+            db_estado  : out std_logic_vector(1 downto 0)
+        );
+    end component;
+
+    component score is
+        port (
+            clock     : in  std_logic;
+            reset     : in  std_logic;
+            increment : in  std_logic;
+            pontuacao : out std_logic_vector(7 downto 0)
+        );
+    end component;
+
     signal s_pos_x, s_fruta_x : std_logic_vector(6 downto 0);
     signal s_pos_y, s_fruta_y : std_logic_vector(5 downto 0);
     signal s_colisao_fruta, s_colisao_parede : std_logic;
     signal s_score : std_logic_vector(7 downto 0);
     signal s_reset_logic : std_logic;
+
 begin
     s_reset_logic <= '1' when (reset = '1' or comandos_uc = "00") else '0';
 
-    POS: entity work.posicao
+    -- InstanciaÃ§Ã£o da PosiÃ§Ã£o
+    POS: posicao
         port map (
             clock_slow => clock_slow,
             reset      => s_reset_logic,
@@ -42,8 +90,8 @@ begin
             pos_y      => s_pos_y
         );
 
-    -- Deteção de Colisões
-    COL: entity work.colisao_detect
+    -- DeteÃ§Ã£o de ColisÃµes
+    COL: colisao_detect
         port map (
             posicao_x      => s_pos_x,
             posicao_y      => s_pos_y,
@@ -53,8 +101,8 @@ begin
             colisao_parede => s_colisao_parede
         );
 
-    -- Gerador Pseudo-aleatório
-    GEN_FRUTA: entity work.gerador_de_frutas
+    -- Gerador Pseudo-aleatÃ³rio
+    GEN_FRUTA: gerador_de_frutas
         port map (
             clock     => clock,
             reset     => s_reset_logic,
@@ -65,8 +113,8 @@ begin
             db_estado => open
         );
 
-    -- Registo de Pontuação Atual
-    SC: entity work.score
+    -- Registo de PontuaÃ§Ã£o Atual
+    SC: score
         port map (
             clock     => clock,
             reset     => s_reset_logic,
@@ -74,7 +122,7 @@ begin
             pontuacao => s_score
         );
 
-    -- Lógica de Saída
+    -- LÃ³gica de SaÃ­da
     perdeu_jogo <= s_colisao_parede;
     out_pos_x   <= s_pos_x;
     out_pos_y   <= s_pos_y;
