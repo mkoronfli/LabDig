@@ -9,7 +9,7 @@ entity clock_divider is
  port (
  clock      : in std_logic;
  clear      : in std_logic;
- clock_slow : out std_logic;
+ clock_slow : out std_logic
  );
 end entity clock_divider;
 
