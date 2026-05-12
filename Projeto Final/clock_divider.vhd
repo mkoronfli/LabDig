@@ -7,9 +7,9 @@ entity clock_divider is
  MODULO : integer := 10000000 -- modulo do contador f_FPGA/f_alvo = 50M/5
  );
  port (
- clock      : in std_logic;
- clear      : in std_logic;
- clock_slow : out std_logic
+    clock      : in std_logic;
+    clear      : in std_logic;
+    clock_slow : out std_logic
  );
 end entity clock_divider;
 
