@@ -1,9 +1,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity gerador_pseudo_aleatorio is
+entity lfsr_parametrizado is 
     generic (
-        N : integer
+        N : integer := 7
     );
     port (
         clock    : in  std_logic;
@@ -13,15 +13,17 @@ entity gerador_pseudo_aleatorio is
     );
 end entity;
 
-architecture gerador of gerador_pseudo_aleatorio is
-    signal s_lfsr : std_logic_vector(N-1 downto 0) := (others => '1'); -- maximo 2^N - 1
+architecture gerador of lfsr_parametrizado is
+    signal s_lfsr : std_logic_vector(N-1 downto 0) := (others => '1');
 begin
     process(clock, reset)
     begin
         if reset = '1' then
             s_lfsr <= (others => '1');
         elsif rising_edge(clock) then
-            s_lfsr <= (s_lfsr(N-4) xor s_lfsr(0)) & s_lfsr(N-2 downto 0);
+            if enable = '1' then
+                s_lfsr <= (s_lfsr(N-2 downto 0) & (s_lfsr(N-1) xor s_lfsr(N-2)));
+            end if;
         end if;
     end process;
     
