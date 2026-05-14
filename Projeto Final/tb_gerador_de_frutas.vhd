@@ -62,7 +62,6 @@ begin
         reset <= '0';
         wait for clockPeriod;
 
-        -- NOVO: PONTAPÉ INICIAL PARA A PRIMEIRA FRUTA
         iniciar_jogo <= '1';
         wait for clockPeriod;
         iniciar_jogo <= '0';
