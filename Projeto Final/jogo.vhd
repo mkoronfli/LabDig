@@ -42,20 +42,21 @@ architecture estrutural of jogo is
 
     component jogo_FD is
         port (
-            clock       : in  std_logic;
-            clock_slow  : in  std_logic;
-            reset       : in  std_logic;
-            comandos_uc : in  std_logic_vector(1 downto 0);
-            btn_up      : in  std_logic;
-            btn_down    : in  std_logic;
-            btn_left    : in  std_logic;
-            btn_right   : in  std_logic;
-            perdeu_jogo : out std_logic;
-            out_pos_x   : out std_logic_vector(6 downto 0);
-            out_pos_y   : out std_logic_vector(5 downto 0);
-            out_fruta_x : out std_logic_vector(6 downto 0);
-            out_fruta_y : out std_logic_vector(5 downto 0);
-            out_score   : out std_logic_vector(7 downto 0)
+            clock        : in  std_logic;
+            clock_slow   : in  std_logic;
+            reset        : in  std_logic;
+            comandos_uc  : in  std_logic_vector(1 downto 0);
+            iniciar_jogo : in  std_logic; 
+            btn_up       : in  std_logic;
+            btn_down     : in  std_logic;
+            btn_left     : in  std_logic;
+            btn_right    : in  std_logic;
+            perdeu_jogo  : out std_logic;
+            out_pos_x    : out std_logic_vector(6 downto 0);
+            out_pos_y    : out std_logic_vector(5 downto 0);
+            out_fruta_x  : out std_logic_vector(6 downto 0);
+            out_fruta_y  : out std_logic_vector(5 downto 0);
+            out_score    : out std_logic_vector(7 downto 0)
         );
     end component;
 
@@ -88,7 +89,7 @@ begin
     DIV_CLK: clock_divider
         port map(clock => clock, clear => reset, enable => '1', clock_slow => clk_slow);
 
-    -- 2. Interface: Filtro dos Botões
+    -- 2. Interface: Filtro dos BotÃµes
     FILTRO_UP: input_filter port map(clock => clock, btn_in => botoes(0), btn_out => s_botoes_filt(0));
     FILTRO_DW: input_filter port map(clock => clock, btn_in => botoes(1), btn_out => s_botoes_filt(1));
     FILTRO_LF: input_filter port map(clock => clock, btn_in => botoes(2), btn_out => s_botoes_filt(2));
@@ -108,20 +109,21 @@ begin
     -- 4. Fluxo de Dados
     FD: jogo_FD
         port map (
-            clock       => clock,
-            clock_slow  => clk_slow,
-            reset       => reset,
-            comandos_uc => s_cmd_telas,
-            btn_up      => s_botoes_filt(0),
-            btn_down    => s_botoes_filt(1),
-            btn_left    => s_botoes_filt(2),
-            btn_right   => s_botoes_filt(3),
-            perdeu_jogo => s_colidiu,
-            out_pos_x   => s_x_display,
-            out_pos_y   => s_y_display,
-            out_fruta_x => s_fx_display,
-            out_fruta_y => s_fy_display,
-            out_score   => s_score_display
+            clock        => clock,
+            clock_slow   => clk_slow,
+            reset        => reset,
+            comandos_uc  => s_cmd_telas,
+            iniciar_jogo => s_botoes_filt(4), 
+            btn_up       => s_botoes_filt(0),
+            btn_down     => s_botoes_filt(1),
+            btn_left     => s_botoes_filt(2),
+            btn_right    => s_botoes_filt(3),
+            perdeu_jogo  => s_colidiu,
+            out_pos_x    => s_x_display,
+            out_pos_y    => s_y_display,
+            out_fruta_x  => s_fx_display,
+            out_fruta_y  => s_fy_display,
+            out_score    => s_score_display
         );
 
     -- 5. Controlador do Display
