@@ -4,20 +4,21 @@ use ieee.numeric_std.all;
 
 entity jogo_FD is
     port (
-        clock       : in  std_logic;
-        clock_slow  : in  std_logic;
-        reset       : in  std_logic;
-        comandos_uc : in  std_logic_vector(1 downto 0); 
-        btn_up      : in  std_logic;
-        btn_down    : in  std_logic;
-        btn_left    : in  std_logic;
-        btn_right   : in  std_logic;
-        perdeu_jogo : out std_logic;
-        out_pos_x   : out std_logic_vector(6 downto 0);
-        out_pos_y   : out std_logic_vector(5 downto 0);
-        out_fruta_x : out std_logic_vector(6 downto 0);
-        out_fruta_y : out std_logic_vector(5 downto 0);
-        out_score   : out std_logic_vector(7 downto 0)
+        clock        : in  std_logic;
+        clock_slow   : in  std_logic;
+        reset        : in  std_logic;
+        comandos_uc  : in  std_logic_vector(1 downto 0); 
+        iniciar_jogo : in  std_logic; 
+        btn_up       : in  std_logic;
+        btn_down     : in  std_logic;
+        btn_left     : in  std_logic;
+        btn_right    : in  std_logic;
+        perdeu_jogo  : out std_logic;
+        out_pos_x    : out std_logic_vector(6 downto 0);
+        out_pos_y    : out std_logic_vector(5 downto 0);
+        out_fruta_x  : out std_logic_vector(6 downto 0);
+        out_fruta_y  : out std_logic_vector(5 downto 0);
+        out_score    : out std_logic_vector(7 downto 0)
     );
 end entity jogo_FD;
 
@@ -49,13 +50,14 @@ architecture estrutural of jogo_FD is
 
     component gerador_de_frutas is
         port (
-            clock      : in  std_logic;
-            reset      : in  std_logic;
-            posicao_x  : in  std_logic_vector(6 downto 0);
-            posicao_y  : in  std_logic_vector(5 downto 0);
-            fruta_x    : out std_logic_vector(6 downto 0);
-            fruta_y    : out std_logic_vector(5 downto 0);
-            db_estado  : out std_logic_vector(1 downto 0)
+            clock        : in  std_logic;
+            reset        : in  std_logic;
+            iniciar_jogo : in  std_logic; 
+            posicao_x    : in  std_logic_vector(6 downto 0);
+            posicao_y    : in  std_logic_vector(5 downto 0);
+            fruta_x      : out std_logic_vector(6 downto 0);
+            fruta_y      : out std_logic_vector(5 downto 0);
+            db_estado    : out std_logic_vector(1 downto 0)
         );
     end component;
 
@@ -102,15 +104,16 @@ begin
         );
 
     -- Gerador Pseudo-aleatório
-    GER_FRUTA: gerador_de_frutas
+    GEN_FRUTA: gerador_de_frutas
         port map (
-            clock     => clock,
-            reset     => s_reset_logic,
-            posicao_x => s_pos_x,
-            posicao_y => s_pos_y,
-            fruta_x   => s_fruta_x,
-            fruta_y   => s_fruta_y,
-            db_estado => open
+            clock        => clock,
+            reset        => s_reset_logic,
+            iniciar_jogo => iniciar_jogo, 
+            posicao_x    => s_pos_x,
+            posicao_y    => s_pos_y,
+            fruta_x      => s_fruta_x,
+            fruta_y      => s_fruta_y,
+            db_estado    => open
         );
 
     -- Registo de Pontuação Atual
