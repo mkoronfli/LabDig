@@ -1,0 +1,140 @@
+
+------------------------------------------------------------------------------
+-- Componente: Conversor de hexadecimal para 7 segmentos        
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity hex7seg is
+	port (  
+			hex      : in  std_logic_vector(3 downto 0);
+         display  : out std_logic_vector(6 downto 0)
+	);
+end hex7seg;
+
+architecture arch of hex7seg is
+begin
+   --
+   --       0  
+   --      ---  
+   --     |   |
+   --    5|   |1
+   --     | 6 |
+   --      ---  
+   --     |   |
+   --    4|   |2
+   --     |   |
+   --      ---  
+   --       3  
+   --
+  display <= "1000000" when hex = "0000" else -- 0
+				 "1111001" when hex = "0001" else -- 1
+				 "0100100" when hex = "0010" else -- 2
+			 	 "0110000" when hex = "0011" else -- 3
+				 "0011001" when hex = "0100" else -- 4
+				 "0010010" when hex = "0101" else -- 5
+				 "0000010" when hex = "0110" else -- 6
+				 "1111000" when hex = "0111" else -- 7
+				 "0000000" when hex = "1000" else -- 8
+				 "0010000" when hex = "1001" else -- 9
+				 "0001000" when hex = "1010" else -- A
+				 "0000011" when hex = "1011" else -- B
+				 "1000110" when hex = "1100" else -- C
+				 "0100001" when hex = "1101" else -- D
+				 "0000110" when hex = "1110" else -- E
+				 "0001110" when hex = "1111" else -- F
+				 "1111111";
+end architecture;
+
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity posicao is
+    port (
+        clock_slow : in  std_logic;
+        reset      : in  std_logic;
+        btn_up     : in  std_logic;
+        btn_down   : in  std_logic;
+        btn_left   : in  std_logic;
+        btn_right  : in  std_logic;
+        display0  : out std_logic_vector(6 downto 0);
+		  display1  : out std_logic_vector(6 downto 0);
+		  display2  : out std_logic_vector(6 downto 0);
+		  display3  : out std_logic_vector(6 downto 0);
+		  display4  : out std_logic_vector(6 downto 0)
+    );
+end entity posicao;
+
+architecture mov of posicao is
+    type direcao_t is (CIMA, BAIXO, ESQUERDA, DIREITA);
+    signal dir_atual : direcao_t := DIREITA;
+    signal s_pos_x   : unsigned(6 downto 0) := to_unsigned(64, 7); -- Centro
+    signal s_pos_y   : unsigned(5 downto 0) := to_unsigned(32, 6); -- Centro
+	 signal s_Q0, s_Q1, s_Q2, s_Q3, s_Q4 : std_logic_vector(3 downto 0);
+	 
+component hex7seg is
+        port (
+            hex      : in  std_logic_vector(3 downto 0);
+            display  : out std_logic_vector(6 downto 0)
+        );
+end component;
+	 
+begin
+    process(clock_slow, reset)
+    begin
+        if reset = '1' then
+            dir_atual <= DIREITA;
+            s_pos_x   <= to_unsigned(64, 7);
+            s_pos_y   <= to_unsigned(32, 6);
+        elsif rising_edge(clock_slow) then
+            -- Tratamento de dire��o
+            if btn_up = '0' and dir_atual /= BAIXO then dir_atual <= CIMA;
+            elsif btn_down = '0' and dir_atual /= CIMA then dir_atual <= BAIXO;
+            elsif btn_left = '0' and dir_atual /= DIREITA then dir_atual <= ESQUERDA;
+            elsif btn_right = '0' and dir_atual /= ESQUERDA then dir_atual <= DIREITA;
+            end if;
+
+            -- Movimento da cabe�a
+            case dir_atual is
+                when CIMA     => s_pos_y <= s_pos_y - 1;
+                when BAIXO    => s_pos_y <= s_pos_y + 1;
+                when ESQUERDA => s_pos_x <= s_pos_x - 1;
+                when DIREITA  => s_pos_x <= s_pos_x + 1;
+            end case;
+        end if;
+    end process;
+	 
+	 s_Q0 <= std_logic_vector(to_unsigned(to_integer(s_pos_x) /100,4));
+	 s_Q1 <= std_logic_vector(to_unsigned(to_integer(s_pos_x mod 100) / 10,4));
+	 s_Q2 <= std_logic_vector(to_unsigned(to_integer(s_pos_x) mod 10,4));
+	 s_Q3 <= std_logic_vector(to_unsigned(to_integer(s_pos_y mod 100) / 10,4));
+	 s_Q4 <= std_logic_vector(to_unsigned(to_integer(s_pos_y) mod 10,4));
+	
+h0: hex7seg port map (
+        hex     => s_Q0,
+        display => display0
+    );
+
+    h1: hex7seg port map (
+        hex     => s_Q1,
+        display => display1
+    );
+
+    h2: hex7seg port map (
+        hex     => s_Q2,
+        display => display2
+    );
+
+    h3: hex7seg port map (
+        hex     => s_Q3,
+        display => display3
+    );
+	 h4: hex7seg port map (
+        hex     => s_Q4,
+        display => display4
+    );
+end architecture;
