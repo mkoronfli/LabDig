@@ -119,8 +119,8 @@ begin
                         -- Desvio de fluxo dependendo do que estamos fazendo
                         if tarefa_atual = INIT then
                             if cmd_idx < 7 then
-                                cmd_idx <= cmd_idx + 1;
                                 data_to_send <= INIT_CMDS(cmd_idx);
+                                cmd_idx <= cmd_idx + 1;
                                 estado_atual <= ST_SEND_BYTE;
                             else
                                 estado_atual <= ST_STOP;
