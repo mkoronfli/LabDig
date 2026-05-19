@@ -40,7 +40,7 @@ architecture behavioral of display_control is
     -- -------------------------------------------------------------------------
     -- Componente frame_buffer
     -- -------------------------------------------------------------------------
-    component frame_buffer is
+    component buffer_telas_jogo is
         port (
             clock      : in  std_logic;
             reset      : in  std_logic;

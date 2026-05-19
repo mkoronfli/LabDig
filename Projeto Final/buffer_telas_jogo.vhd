@@ -39,12 +39,12 @@ entity buffer_telas_jogo is
 
         cmd_telas     : in  std_logic_vector(1 downto 0);   -- "00"=menu, "01"=jogo, "10"=fim
         
-        score         : in  integer range 0 to 99;        
-        max_score     : in  integer range 0 to 99;  
         pos_x         : in  std_logic_vector(6 downto 0);   
         pos_y         : in  std_logic_vector(5 downto 0);   
         fruta_x       : in  std_logic_vector(6 downto 0);
         fruta_y       : in  std_logic_vector(5 downto 0);
+        score         : in  integer range 0 to 99;        
+        max_score     : in  integer range 0 to 99;  
 
         fb_page     : in  integer range 0 to 7;                -- página atual (0 a 7)
         fb_col      : in  integer range 0 to 127;              -- coluna atual (0 a 127)
