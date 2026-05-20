@@ -49,8 +49,8 @@ architecture behavioral of display_control is
             pos_y      : in  std_logic_vector(5 downto 0);
             fruta_x    : in  std_logic_vector(6 downto 0);
             fruta_y    : in  std_logic_vector(5 downto 0);
-            score      : in  std_logic_vector(7 downto 0);
-            max_score  : in  std_logic_vector(7 downto 0);
+            score      : in  integer range 0 to 99;
+            max_score  : in  integer range 0 to 99;
             fb_page    : in  integer range 0 to 7;
             fb_col     : in  integer range 0 to 127;
             fb_byte    : out std_logic_vector(7 downto 0)
@@ -67,6 +67,7 @@ architecture behavioral of display_control is
         ST_ACK,             -- aguarda ACK do slave
         ST_STOP,            -- gera STOP condition I²C
         ST_WAIT,            -- intervalo entre frames
+        ST_CTRL_CMD,         -- estado intermediario de envio de byte de controle
         ST_INIT_SEND,       -- envia os 23 bytes de init
         ST_PAGE_CMD,        -- envia SET_PAGE  (0xB0+page)
         ST_COL_LOW,         -- envia SET_COL_L (0x00 + low nibble)
@@ -115,6 +116,9 @@ architecture behavioral of display_control is
         x"81", x"CF", x"D9", x"F1", x"DB", x"40", x"AF"
     );
 
+    signal s_score    : integer range 0 to 99 := 0;
+    signal s_max_score : integer range 0 to 99 := 0;
+
 begin
 
     oled_scl <= scl_reg;
@@ -124,8 +128,12 @@ begin
     s_fb_page <= cur_page;
     s_fb_col  <= cur_col;
 
+    s_score <= to_integer(unsigned(score));
+    s_max_score <= to_integer(unsigned(max_score));
+
+
     -- Instância do frame_buffer
-    FB: frame_buffer
+    FB: buffer_telas_jogo
         port map (
             clock     => clock,
             reset     => reset,
@@ -134,8 +142,8 @@ begin
             pos_y     => pos_y,
             fruta_x   => fruta_x,
             fruta_y   => fruta_y,
-            score     => score,
-            max_score => max_score,
+            score     => s_score,
+            max_score => s_max_score,
             fb_page   => s_fb_page,
             fb_col    => s_fb_col,
             fb_byte   => s_fb_byte
@@ -167,7 +175,7 @@ begin
                     if tarefa_atual = INIT then
                         -- Primeiro START envia o endereço do display
                         data_to_send  <= x"3C";
-                        estado_apos_ack <= ST_INIT_SEND;
+                        estado_apos_ack <= ST_CTRL_CMD;
                         estado_atual  <= ST_START;
                     else
                         -- Inicia envio de um frame completo
@@ -177,6 +185,11 @@ begin
                         estado_apos_ack <= ST_PAGE_CMD;
                         estado_atual <= ST_START;
                     end if;
+
+                when ST_CTRL_CMD =>
+                    data_to_send    <= x"00";   -- byte de controle: próximos bytes são comandos
+                    estado_apos_ack <= ST_INIT_SEND;
+                    estado_atual    <= ST_SEND_BYTE;
 
                 -- -------------------------------------------------------------
                 -- START condition: SDA desce com SCL alto
@@ -218,12 +231,9 @@ begin
                 -- ACK: libera SDA e gera pulso de clock para o slave responder
                 -- -------------------------------------------------------------
                 when ST_ACK =>
-                    if timer < 250 then
+                    if timer < 500 then
                         sda_reg <= '1';
-                        scl_reg <= '1';
-                        timer   := timer + 1;
-                    elsif timer < 500 then
-                        scl_reg <= '0';
+                        scl_reg <= '0';   -- mantém SCL baixo durante todo o ACK
                         timer   := timer + 1;
                     else
                         timer        := 0;
@@ -286,27 +296,26 @@ begin
                 -- Depois da última coluna da última página → STOP e WAIT
                 -- -------------------------------------------------------------
                 when ST_FRAME_SEND =>
-                    -- s_fb_byte já está disponível de forma combinacional
+                    -- Carrega o byte ANTES de incrementar cur_col
                     data_to_send <= s_fb_byte;
 
                     if cur_col < 127 then
-                        cur_col         <= cur_col + 1;
                         estado_apos_ack <= ST_FRAME_SEND;
                         estado_atual    <= ST_SEND_BYTE;
+                        cur_col         <= cur_col + 1;
                     else
-                        -- Última coluna da página atual
-                        cur_col <= 0;
+                    -- Última coluna da página atual: avança página no próximo ciclo
                         if cur_page < 7 then
-                            -- Avança para a próxima página
+                            cur_col         <= 0;
                             cur_page        <= cur_page + 1;
                             estado_apos_ack <= ST_PAGE_CMD;
                             estado_atual    <= ST_SEND_BYTE;
                         else
-                            -- Frame completo — encerra a transação
-                            cur_page     <= 0;
-                            estado_atual <= ST_SEND_BYTE;
-                            -- Após o último ACK vai para STOP
+                        -- Frame completo — encerra a transação
+                            cur_col         <= 0;
+                            cur_page        <= 0;
                             estado_apos_ack <= ST_STOP;
+                            estado_atual    <= ST_SEND_BYTE;
                         end if;
                     end if;
 
