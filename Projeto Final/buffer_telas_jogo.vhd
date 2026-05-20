@@ -152,23 +152,18 @@ constant JOGAR: str5_type := (21,18,16,12,20);
 constant GAME_OVER: str9_type := (16,12,17,14,15,18,19,14,20);
 
 -- escrevendo "SCORE"
-constant SCORE: str5_type := (10,24,18,20,14);
+constant SCORE_STR: str5_type := (10,24,18,20,14);
 
 --------------------------------------------------------------------------------------------------------
 
-signal sig_fb_byte := (others => '0'); 
+signal sig_x : integer range 0 to 127;
+signal sig_y : integer range 0 to 63;
+signal sig_fx : integer range 0 to 127;
+signal sig_fy : integer range 0 to 63;
+signal sig_max_score : integer range 0 to 99;
 
-signal sig_x = integer range 0 to 127;
-signal sig_y = integer range 0 to 63;
-signal sig_fx = integer range 0 to 127;
-signal sig_fy = integer range 0 to 63;
-
-signal sig_unit = integer range 0 to 9;
-signal sig_tens = integer range 0 to 9;
-
-signal sig_rel_col  : integer range 0 to 127; -- posicao relativa da coluna dentro do string
-signal sig_char_idx : integer range 0 to 9; -- indice do caracter dentro da string
-signal sig_inner_col : integer range 0 to 5; -- coluna interna do caracter
+signal sig_unit : integer range 0 to 9;
+signal sig_tens : integer range 0 to 9;
 
 -- posicoes alvo de renderizacao de 1 pixel
 signal sig_cobra_page : integer range 0 to 7;
@@ -182,6 +177,7 @@ sig_x  <= to_integer(unsigned(pos_x));
 sig_y  <= to_integer(unsigned(pos_y));
 sig_fx <= to_integer(unsigned(fruta_x));
 sig_fy <= to_integer(unsigned(fruta_y));
+sig_max_score <= max_score;
 
 sig_unit  <= score mod 10;
 sig_tens  <= score / 10;
@@ -191,91 +187,100 @@ sig_cobra_bit  <= sig_y  mod 8;
 sig_fruta_page <= sig_fy / 8;
 sig_fruta_bit  <= sig_fy mod 8;
 
-process(cmd_telas, fb_page, fb_col, pos_x, pos_y, fruta_x, fruta_y, score, max_score)
+process(cmd_telas, fb_page, fb_col, pos_x, pos_y, fruta_x, fruta_y, score, max_score,
+        sig_cobra_page, sig_cobra_bit, sig_fruta_page, sig_fruta_bit,
+        sig_x, sig_fx, sig_tens, sig_unit, sig_max_score)
+
+    variable v_fb_byte     : std_logic_vector(7 downto 0);
+    variable v_rel_col     : integer range 0 to 127;
+    variable v_char_idx    : integer range 0 to 9;
+    variable v_inner_col   : integer range 0 to 5;
+
     begin
 
-        sig_fb_byte <= (others => '0');  -- valor padrão: todos os pixels apagados
+        v_fb_byte := (others => '0');  -- valor padrão: todos os pixels apagados
 
         case cmd_telas is
             when "00" =>  -- MENU
 
             -- snake game
-            if fb_page = 0 and fb col >=34 and fb_col < 93 then
-                sig_rel_col <= fb_col - 34;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <= 4 then
-                    sig_fb_byte <= FONT(SNAKE_GAME(sig_char_idx)(sig_inner_col));
+            if fb_page = 0 and fb_col >=34 and fb_col < 93 then
+                v_rel_col := fb_col - 34;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <= 4 then
+                    v_fb_byte := FONT(SNAKE_GAME(v_char_idx))(v_inner_col);
                 end if;
             end if;
 
             -- best score
             if fb_page = 2 and fb_col >= 14 and fb_col <= 73 then
-                sig_rel_col <= fb_col - 14;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <=4 then
-                    sig_fb_byte <= FONT(BEST_SCORE(sig_char_idx)(sig_inner_col));
+                v_rel_col := fb_col - 14;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <= 4 then
+                    v_fb_byte := FONT(BEST_SCORE(v_char_idx))(v_inner_col);
                 end if;
+            end if;
 
             -- max score
             if fb_page = 2 and fb_col >= 74 and fb_col <= 85 then
-                sig_rel_col <= fb_col - 74;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <=4 then
-                    if sig_rel_col < 6 then
-                        sig_fb_byte <= FONT(SCORE(sig_max_score / 10)(sig_inner_col)); 
+                v_rel_col := fb_col - 74;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <= 4 then
+                    if v_rel_col < 6 then
+                        v_fb_byte := FONT(sig_max_score / 10)(v_inner_col); 
                     else
-                    sig_fb_byte <= FONT(SCORE(sig_max_score mod 10)(sig_inner_col));
+                        v_fb_byte := FONT(sig_max_score mod 10)(v_inner_col);
                     end if;
                 end if;
             end if;
 
             -- jogar
             if fb_page = 5 and fb_col >= 49 and fb_col <= 78 then
-                sig_rel_col <= fb_col - 49;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <=4 then
-                    sig_fb_byte <= FONT(JOGAR(sig_char_idx)(sig_inner_col));
+                v_rel_col := fb_col - 49;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <=4 then
+                    v_fb_byte := FONT(JOGAR(v_char_idx))(v_inner_col);
                 end if;
+            end if;
 
-            sig_rel_col <= 
             when "01" =>  -- JOGADA
             -- borda esquerda 
 
             if fb_col = 0 then
-                sig_fb_byte <= x"FF";  -- acende todos os bits da coluna
+                v_fb_byte := x"FF";  -- acende todos os bits da coluna
             end if;
 
             -- borda direita
 
             if fb_col = 127 then
-                sig_fb_byte <= x"FF";  -- acende todos os bits da coluna
+                v_fb_byte := x"FF";  -- acende todos os bits da coluna
             end if;
 
             -- borda superior
             if fb_page = 0 then
-                sig_fb_byte <= sig_fb_byte orx"01";  -- acende todos os bits da linha
+                v_fb_byte := v_fb_byte or x"01";  -- acende todos os bits da linha
             end if;
 
             -- borda inferior
-            if fb_page = 63 then
-                sig_fb_byte <= sig_fb_byte or x"80";  -- acende todos os bits da linha
+            if fb_page = 7 then
+                v_fb_byte := v_fb_byte or x"80";  -- acende todos os bits da linha
             end if;
             
             -- renderizando score
             if fb_page = 0 and fb_col >= 104 and fb_col <115 then
-                sig_rel_col <= fb_col - 104;  -- coluna relativa dentro do espaço de score
-                sig_char_idx <= sig_rel_col / 6;  
-                sig_inner_col <= sig_rel_col mod 6; 
+                v_rel_col := fb_col - 104;  -- coluna relativa dentro do espaço de score
+                v_char_idx := v_rel_col / 6;  
+                v_inner_col := v_rel_col mod 6; 
 
-                if sig_inner_col <= 4 then
-                    if sig_rel_col < 6 then
-                        sig_fb_byte <= sig_fb_byte or FONT(SCORE(sig_tens)(sig_inner_col)); 
+                if v_inner_col <= 4 then
+                    if v_rel_col < 6 then
+                        v_fb_byte := v_fb_byte or FONT(sig_tens)(v_inner_col); 
                         else
-                        sig_fb_byte <= sig_fb_byte or FONT(SCORE(sig_unit)(sig_inner_col));
+                        v_fb_byte := v_fb_byte or FONT(sig_unit)(v_inner_col);
                     end if;
                 end if;
             end if; 
@@ -283,79 +288,80 @@ process(cmd_telas, fb_page, fb_col, pos_x, pos_y, fruta_x, fruta_y, score, max_s
             -- renderizando pixel da cobra
 
             if fb_page = sig_cobra_page and fb_col = sig_x then
-                sig_fb_byte <= sig_fb_byte or std_logic_vector(to_unsigned(sig_cobra_bit, 8));  -- acende o bit no byte de saída
+                v_fb_byte := v_fb_byte or std_logic_vector(shift_left(to_unsigned(1, 8), sig_cobra_bit));  -- acende o bit no byte de saída
             end if;
 
             -- renderizando pixel da fruta
 
             if fb_page = sig_fruta_page and fb_col = sig_fx then
-                sig_fb_byte <= sig_fb_byte or std_logic_vector(to_unsigned(sig_fruta_bit, 8));  -- acende o bit no byte de saída
+                v_fb_byte := v_fb_byte or std_logic_vector(shift_left(to_unsigned(1, 8), sig_fruta_bit));  -- acende o bit no byte de saída
             end if;
 
             when "10" =>  -- GAME OVER
             -- game over
-            if fb_page = 0 and fb col >=19 and fb_col < 72 then
-                sig_rel_col <= fb_col - 19;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <= 4 then
-                    sig_fb_byte <= FONT(GAME_OVER(sig_char_idx)(sig_inner_col));
+            if fb_page = 0 and fb_col >=19 and fb_col < 72 then
+                v_rel_col := fb_col - 19;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <= 4 then
+                    v_fb_byte := FONT(GAME_OVER(v_char_idx))(v_inner_col);
                 end if;
             end if;
 
             -- score
-             if fb_page = 3 and fb col >=24 and fb_col < 53 then
-                sig_rel_col <= fb_col - 24;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <= 4 then
-                    sig_fb_byte <= FONT(SCORE(sig_char_idx)(sig_inner_col));
+             if fb_page = 3 and fb_col >=24 and fb_col < 53 then
+                v_rel_col := fb_col - 24;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <= 4 then
+                    v_fb_byte := FONT(SCORE_STR(v_char_idx))(v_inner_col);
                 end if;
             end if;
 
             -- renderizando score
             if fb_page = 3 and fb_col >= 104 and fb_col <115 then
-                sig_rel_col <= fb_col - 104;  -- coluna relativa dentro do espaço de score
-                sig_char_idx <= sig_rel_col / 6;  
-                sig_inner_col <= sig_rel_col mod 6; 
+                v_rel_col := fb_col - 104;  -- coluna relativa dentro do espaço de score
+                v_char_idx := v_rel_col / 6;  
+                v_inner_col := v_rel_col mod 6; 
 
-                if sig_inner_col <= 4 then
-                    if sig_rel_col < 6 then
-                        sig_fb_byte <= sig_fb_byte or FONT(SCORE(sig_tens)(sig_inner_col)); 
+                if v_inner_col <= 4 then
+                    if v_rel_col < 6 then
+                        v_fb_byte := v_fb_byte or FONT(sig_tens)(v_inner_col); 
                         else
-                        sig_fb_byte <= sig_fb_byte or FONT(SCORE(sig_unit)(sig_inner_col));
+                        v_fb_byte := v_fb_byte or FONT(sig_unit)(v_inner_col);
                     end if;
                 end if;
             end if; 
 
              -- best score
             if fb_page = 5 and fb_col >= 14 and fb_col <= 73 then
-                sig_rel_col <= fb_col - 14;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <=4 then
-                    sig_fb_byte <= FONT(BEST_SCORE(sig_char_idx)(sig_inner_col));
+                v_rel_col := fb_col - 14;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <=4 then
+                    v_fb_byte := FONT(BEST_SCORE(v_char_idx))(v_inner_col);
                 end if;
+            end if;
 
             -- max score
             if fb_page = 5 and fb_col >= 74 and fb_col <= 85 then
-                sig_rel_col <= fb_col - 74;
-                sig_char_idx <= sig_rel_col / 6;
-                sig_inner_col <= sig_rel_col mod 6;
-                if sig_inner_col <=4 then
-                    if sig_rel_col < 6 then
-                        sig_fb_byte <= FONT(SCORE(sig_max_score / 10)(sig_inner_col)); 
+                v_rel_col := fb_col - 74;
+                v_char_idx := v_rel_col / 6;
+                v_inner_col := v_rel_col mod 6;
+                if v_inner_col <=4 then
+                    if v_rel_col < 6 then
+                        v_fb_byte := FONT(sig_max_score / 10)(v_inner_col); 
                     else
-                    sig_fb_byte <= FONT(SCORE(sig_max_score mod 10)(sig_inner_col));
+                    v_fb_byte := FONT(sig_max_score mod 10)(v_inner_col);
                     end if;
                 end if;
             end if;
 
             when others =>
-                sig_fb_byte <= (others => '0');
+                v_fb_byte := (others => '0');
         end case;
 
-    fb_byte <= sig_fb_byte;
+    fb_byte <= v_fb_byte;
 
 end process;
 
