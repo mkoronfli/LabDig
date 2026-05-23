@@ -33,7 +33,6 @@ architecture estrutural of jogo_FD is
 
     component posicao is
         port (
-            clock      : in  std_logic;
             clock_slow : in  std_logic;
             reset      : in  std_logic;
             btn_up     : in  std_logic;
@@ -100,7 +99,6 @@ begin
 
     POS_INST: posicao
         port map (
-            clock      => clock,
             clock_slow => clock_slow,
             reset      => s_reset_logic,
             btn_up     => btn_up,
