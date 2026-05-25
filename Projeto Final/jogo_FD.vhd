@@ -30,6 +30,7 @@ architecture estrutural of jogo_FD is
     signal s_colisao_fruta    : std_logic;
     signal s_colisao_parede   : std_logic;
     signal s_reset_logic      : std_logic;
+    signal s_iniciar_jogo     : std_logic; 
 
     component posicao is
         port (
@@ -57,13 +58,14 @@ architecture estrutural of jogo_FD is
 
     component gerador_de_frutas is
         port (
-            clock     : in  std_logic;
-            reset     : in  std_logic;
-            posicao_x : in  std_logic_vector(6 downto 0);
-            posicao_y : in  std_logic_vector(5 downto 0);
-            fruta_x   : out std_logic_vector(6 downto 0);
-            fruta_y   : out std_logic_vector(5 downto 0);
-            db_estado : out std_logic_vector(1 downto 0)
+            clock        : in  std_logic;
+            reset        : in  std_logic;
+            iniciar_jogo : in  std_logic;
+            posicao_x    : in  std_logic_vector(6 downto 0);
+            posicao_y    : in  std_logic_vector(5 downto 0);
+            fruta_x      : out std_logic_vector(6 downto 0);
+            fruta_y      : out std_logic_vector(5 downto 0);
+            db_estado    : out std_logic_vector(1 downto 0)
         );
     end component;
 
@@ -88,6 +90,8 @@ architecture estrutural of jogo_FD is
 begin
 
     s_reset_logic <= '1' when comandos_uc = "00" else reset;
+    s_iniciar_jogo <= '1' when comandos_uc = "01" else '0';
+    
     perdeu_jogo   <= s_colisao_parede;
 
     out_pos_x     <= s_pos_x;
@@ -97,7 +101,7 @@ begin
     out_score     <= s_score;
     out_max_score <= s_max_score;
 
-    POS_INST: posicao
+    POS: posicao
         port map (
             clock_slow => clock_slow,
             reset      => s_reset_logic,
@@ -123,13 +127,14 @@ begin
     -- Gerador Pseudo-aleatório
     GEN_FRUTA: gerador_de_frutas
         port map (
-            clock     => clock,
-            reset     => s_reset_logic,
-            posicao_x => s_pos_x,
-            posicao_y => s_pos_y,
-            fruta_x   => s_fruta_x,
-            fruta_y   => s_fruta_y,
-            db_estado => open
+            clock        => clock,
+            reset        => s_reset_logic,
+            iniciar_jogo => s_iniciar_jogo,
+            posicao_x    => s_pos_x,
+            posicao_y    => s_pos_y,
+            fruta_x      => s_fruta_x,
+            fruta_y      => s_fruta_y,
+            db_estado    => open
         );
 
     -- Registo de Pontuação Atual
