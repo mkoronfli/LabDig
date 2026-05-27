@@ -8,9 +8,9 @@ entity jogo is
         botoes   : in  std_logic_vector(4 downto 0);
         hsync     : out std_logic;
         vsync     : out std_logic;
-        red       : out std_logic;
-        green     : out std_logic;
-        blue      : out std_logic
+        red       : out std_logic_vector(3 downto 0);
+        green     : out std_logic_vector(3 downto 0);
+        blue      : out std_logic_vector(3 downto 0)
     );
 end entity jogo;
 
@@ -76,9 +76,9 @@ architecture estrutural of jogo is
         max_score : in  integer range 0 to 99;
         hsync     : out std_logic;
         vsync     : out std_logic;
-        red       : out std_logic;
-        green     : out std_logic;
-        blue      : out std_logic
+        red       : out std_logic_vector(3 downto 0);
+        green     : out std_logic_vector(3 downto 0);
+        blue      : out std_logic_vector(3 downto 0)
     );
 end vga;
 

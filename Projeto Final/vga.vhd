@@ -15,9 +15,9 @@ entity vga is
         max_score : in  integer range 0 to 99;
         hsync     : out std_logic;
         vsync     : out std_logic;
-        red       : out std_logic;
-        green     : out std_logic;
-        blue      : out std_logic
+        red       : out std_logic_vector(3 downto 0);
+        green     : out std_logic_vector(3 downto 0);
+        blue      : out std_logic_vector(3 downto 0)
     );
 end vga;
 
@@ -147,8 +147,8 @@ begin
                            and py >= OFFSET_Y and py < OFFSET_Y + 256) else '0';
 
     -- Saída de cor: branco quando pixel ativo, preto caso contrário
-    red   <= sig_video_on and in_game_area and pixel_on;
-    green <= sig_video_on and in_game_area and pixel_on;
-    blue  <= sig_video_on and in_game_area and pixel_on;
+    red   <= "1111" when sig_video_on and in_game_area and pixel_on else "0000";
+    green <= "1111" when sig_video_on and in_game_area and pixel_on else "0000";
+    blue  <= "1111" when sig_video_on and in_game_area and pixel_on else "0000";
 
 end architecture Behavioral;
