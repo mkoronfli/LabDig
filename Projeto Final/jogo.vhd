@@ -6,8 +6,11 @@ entity jogo is
         clock    : in  std_logic;
         reset    : in  std_logic;
         botoes   : in  std_logic_vector(4 downto 0);
-        oled_scl : out std_logic;
-        oled_sda : out std_logic
+        hsync     : out std_logic;
+        vsync     : out std_logic;
+        red       : out std_logic;
+        green     : out std_logic;
+        blue      : out std_logic
     );
 end entity jogo;
 
@@ -60,21 +63,24 @@ architecture estrutural of jogo is
         );
     end component;
 
-    component display_control is
-        port (
-            clock      : in  std_logic;
-            reset      : in  std_logic;
-            cmd_telas  : in  std_logic_vector(1 downto 0);
-            pos_x      : in  std_logic_vector(6 downto 0);
-            pos_y      : in  std_logic_vector(5 downto 0);
-            fruta_x    : in  std_logic_vector(6 downto 0);
-            fruta_y    : in  std_logic_vector(5 downto 0);
-            score      : in  std_logic_vector(7 downto 0);
-            max_score  : in  std_logic_vector(7 downto 0);
-            oled_scl   : out std_logic;
-            oled_sda   : out std_logic
-        );
-    end component;
+    component vga is
+    port(
+        clk_25MHz : in  std_logic;
+        reset     : in  std_logic;
+        cmd_telas : in  std_logic_vector(1 downto 0);
+        pos_x     : in  std_logic_vector(6 downto 0);
+        pos_y     : in  std_logic_vector(5 downto 0);
+        fruta_x   : in  std_logic_vector(6 downto 0);
+        fruta_y   : in  std_logic_vector(5 downto 0);
+        score     : in  integer range 0 to 99;
+        max_score : in  integer range 0 to 99;
+        hsync     : out std_logic;
+        vsync     : out std_logic;
+        red       : out std_logic;
+        green     : out std_logic;
+        blue      : out std_logic
+    );
+end vga;
 
     signal clk_slow        : std_logic;
     signal s_botoes_filt   : std_logic_vector(4 downto 0);
@@ -134,9 +140,9 @@ begin
         );
 
     -- Controlador do Display
-    DISPLAY: display_control
+    VGA: vga
         port map (
-            clock     => clock,
+            clk_25MHz => clock,
             reset     => reset,
             cmd_telas => s_cmd_telas,
             pos_x     => s_x_display,
@@ -145,8 +151,11 @@ begin
             fruta_y   => s_fy_display,
             score     => s_score_display,
             max_score => s_max_score_display,
-            oled_scl  => oled_scl,
-            oled_sda  => oled_sda
+            hsync     => hsync,
+            vsync     => vsync,
+            red       => red,
+            green     => green,
+            blue      => blue
         );
 
 end architecture estrutural;
