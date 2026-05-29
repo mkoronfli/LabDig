@@ -1,0 +1,95 @@
+# =========================================================================
+# Quartus Settings File - jogo (DE0-CV)
+# =========================================================================
+set_global_assignment -name FAMILY "Cyclone V"
+set_global_assignment -name DEVICE 5CEBA4F23C7
+set_global_assignment -name TOP_LEVEL_ENTITY jogo
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+
+# --- Arquivos de fonte (hierarquia do top "jogo") ---
+set_global_assignment -name VHDL_FILE jogo.vhd
+set_global_assignment -name VHDL_FILE jogo_UC.vhd
+set_global_assignment -name VHDL_FILE jogo_FD.vhd
+set_global_assignment -name VHDL_FILE clock_divider.vhd
+set_global_assignment -name VHDL_FILE input_filter.vhd
+set_global_assignment -name VHDL_FILE posicao.vhd
+set_global_assignment -name VHDL_FILE colisao_detect.vhd
+set_global_assignment -name VHDL_FILE gerador_de_frutas.vhd
+set_global_assignment -name VHDL_FILE lfsr_parametrizado.vhd
+set_global_assignment -name VHDL_FILE frutas_UC.vhd
+set_global_assignment -name VHDL_FILE score.vhd
+set_global_assignment -name VHDL_FILE max_score.vhd
+set_global_assignment -name VHDL_FILE vga.vhd
+set_global_assignment -name VHDL_FILE vga_controller.vhd
+set_global_assignment -name VHDL_FILE buffer_telas_jogo.vhd
+
+# =========================================================================
+# Pinagem DE0-CV
+# =========================================================================
+
+# --- Clock 50 MHz ---
+set_location_assignment PIN_M9 -to clock
+
+# --- Reset (chave SW0, ativa em 1) ---
+set_location_assignment PIN_U13 -to reset
+
+# --- Botoes de movimento (KEY0-3, ativos em 0; invertidos no RTL) ---
+# KEY0 -> cima
+set_location_assignment PIN_P18 -to botoes[0]
+# KEY1 -> baixo
+set_location_assignment PIN_R17 -to botoes[1]
+# KEY2 -> esquerda
+set_location_assignment PIN_T20 -to botoes[2]
+# KEY3 -> direita
+set_location_assignment PIN_T18 -to botoes[3]
+
+# --- Iniciar (chave SW1, ativa em 1) ---
+# SW1 -> iniciar
+set_location_assignment PIN_T15 -to botoes[4]
+
+# --- VGA ---
+set_location_assignment PIN_A9  -to red[0]
+set_location_assignment PIN_B10 -to red[1]
+set_location_assignment PIN_C9  -to red[2]
+set_location_assignment PIN_A5  -to red[3]
+set_location_assignment PIN_L7  -to green[0]
+set_location_assignment PIN_K7  -to green[1]
+set_location_assignment PIN_J7  -to green[2]
+set_location_assignment PIN_J8  -to green[3]
+set_location_assignment PIN_B6  -to blue[0]
+set_location_assignment PIN_B7  -to blue[1]
+set_location_assignment PIN_A8  -to blue[2]
+set_location_assignment PIN_A7  -to blue[3]
+set_location_assignment PIN_H8  -to hsync
+set_location_assignment PIN_G8  -to vsync
+
+# --- IO Standard (banco VGA/IO da DE0-CV = 3.3-V LVTTL) ---
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clock
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to reset
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to botoes[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to botoes[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to botoes[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to botoes[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to botoes[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hsync
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to vsync
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to red[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to red[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to red[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to red[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to green[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to green[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to green[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to green[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to blue[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to blue[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to blue[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to blue[3]
+
+set_global_assignment -name LAST_QUARTUS_VERSION "20.1.1 Lite Edition"
+set_global_assignment -name SDC_FILE jogo.sdc
+
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
