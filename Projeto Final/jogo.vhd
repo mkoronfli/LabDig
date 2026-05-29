@@ -3,14 +3,13 @@ use ieee.std_logic_1164.all;
 
 entity jogo is
     port (
-        clock    : in  std_logic;
-        reset    : in  std_logic;
-        botoes   : in  std_logic_vector(4 downto 0);
-        hsync     : out std_logic;
-        vsync     : out std_logic;
-        red       : out std_logic_vector(3 downto 0);
-        green     : out std_logic_vector(3 downto 0);
-        blue      : out std_logic_vector(3 downto 0)
+        clock    : in    std_logic;
+        reset    : in    std_logic;
+        botoes   : in    std_logic_vector(4 downto 0);
+        
+        -- Saídas substituídas: Sai VGA, entra OLED I2C
+        oled_scl : inout std_logic;
+        oled_sda : inout std_logic
     );
 end entity jogo;
 
@@ -45,42 +44,37 @@ architecture estrutural of jogo is
 
     component jogo_FD is
         port (
-            clock       : in  std_logic;
-            clock_slow  : in  std_logic;
-            reset       : in  std_logic;
-            comandos_uc : in  std_logic_vector(1 downto 0);
-            btn_up      : in  std_logic;
-            btn_down    : in  std_logic;
-            btn_left    : in  std_logic;
-            btn_right   : in  std_logic;
-            perdeu_jogo : out std_logic;
-            out_pos_x   : out std_logic_vector(6 downto 0);
-            out_pos_y   : out std_logic_vector(5 downto 0);
-            out_fruta_x : out std_logic_vector(6 downto 0);
-            out_fruta_y : out std_logic_vector(5 downto 0);
-            out_score   : out std_logic_vector(7 downto 0);
+            clock         : in  std_logic;
+            clock_slow    : in  std_logic;
+            reset         : in  std_logic;
+            comandos_uc   : in  std_logic_vector(1 downto 0);
+            btn_up        : in  std_logic;
+            btn_down      : in  std_logic;
+            btn_left      : in  std_logic;
+            btn_right     : in  std_logic;
+            perdeu_jogo   : out std_logic;
+            out_pos_x     : out std_logic_vector(6 downto 0);
+            out_pos_y     : out std_logic_vector(5 downto 0);
+            out_fruta_x   : out std_logic_vector(6 downto 0);
+            out_fruta_y   : out std_logic_vector(5 downto 0);
+            out_score     : out std_logic_vector(7 downto 0);
             out_max_score : out std_logic_vector(7 downto 0)
         );
     end component;
 
-    component vga is
-    port(
-        clk_25MHz : in  std_logic;
-        reset     : in  std_logic;
-        cmd_telas : in  std_logic_vector(1 downto 0);
-        pos_x     : in  std_logic_vector(6 downto 0);
-        pos_y     : in  std_logic_vector(5 downto 0);
-        fruta_x   : in  std_logic_vector(6 downto 0);
-        fruta_y   : in  std_logic_vector(5 downto 0);
-        score     : in  integer range 0 to 99;
-        max_score : in  integer range 0 to 99;
-        hsync     : out std_logic;
-        vsync     : out std_logic;
-        red       : out std_logic_vector(3 downto 0);
-        green     : out std_logic_vector(3 downto 0);
-        blue      : out std_logic_vector(3 downto 0)
-    );
-end vga;
+    -- Componente VGA substituído pelo Controlador OLED
+    component oled_driver is
+        port (
+            clock       : in  std_logic;
+            reset       : in  std_logic;
+            pos_cobra_x : in  std_logic_vector(6 downto 0);
+            pos_cobra_y : in  std_logic_vector(5 downto 0);
+            pos_fruta_x : in  std_logic_vector(6 downto 0);
+            pos_fruta_y : in  std_logic_vector(5 downto 0);
+            oled_scl    : inout std_logic;
+            oled_sda    : inout std_logic
+        );
+    end component;
 
     signal clk_slow        : std_logic;
     signal s_botoes_filt   : std_logic_vector(4 downto 0);
@@ -139,23 +133,17 @@ begin
             out_max_score => s_max_score_display
         );
 
-    -- Controlador do Display
-    VGA: vga
+    -- Controlador do Display OLED
+    OLED: oled_driver
         port map (
-            clk_25MHz => clock,
-            reset     => reset,
-            cmd_telas => s_cmd_telas,
-            pos_x     => s_x_display,
-            pos_y     => s_y_display,
-            fruta_x   => s_fx_display,
-            fruta_y   => s_fy_display,
-            score     => s_score_display,
-            max_score => s_max_score_display,
-            hsync     => hsync,
-            vsync     => vsync,
-            red       => red,
-            green     => green,
-            blue      => blue
+            clock       => clock,
+            reset       => reset,
+            pos_cobra_x => s_x_display,
+            pos_cobra_y => s_y_display,
+            pos_fruta_x => s_fx_display,
+            pos_fruta_y => s_fy_display,
+            oled_scl    => oled_scl,
+            oled_sda    => oled_sda
         );
 
 end architecture estrutural;
